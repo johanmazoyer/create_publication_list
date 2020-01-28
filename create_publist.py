@@ -4,7 +4,7 @@ import ads
 ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
 author_name = 'Mazoyer, Johan'  # your name
 name_short = 'Mazoyer'
-years = (2011, 2019) # years to be queried: (start year, end year)
+years = (2011, 2020) # years to be queried: (start year, end year)
 refereed = True # if True, only refereed publications will be queried;
                 # if False, only non-refereed publications will be queried
 
@@ -88,12 +88,36 @@ def create_latex(paper, name=None):
         for i in range(len(paper.author)):
             # `name` is the i-th author on this paper
             author = utf8tolatex(paper.author[i])
+            nom = author.split(',')[0]
+            prenoms = author.split(',')[1]
+            prenoms = prenoms.replace("-", " -")
+            prenoms = prenoms.split(' ')
+            while True:
+                try :
+                    prenoms.remove('')
+                except ValueError:
+                    break
+    
+            for prenomj, prenom  in enumerate(prenoms):
+                if prenom[0] == '-':
+                    prenoms[prenomj] =  prenom[0:2] + '.'
+                elif prenom[0] == '{':
+                    end = prenom.find('}')
+                    prenoms[prenomj] = prenom[0:end+1] + '.'
+                else:
+                    prenoms[prenomj] = prenom[0] + '.'
 
+            author = nom + ", "+" ".join(prenoms)
+            #print(author)
+            
             if i < 3:
                 if name_short in author:
                     authors.append('{\\bf ' + author + '}')
                 else:
                     authors.append(author)
+
+                    #if len(prenoms.split(' ')) > 2:
+                    #    print(author.split(' ')[1])
             else:
                 etal = True
                 break
