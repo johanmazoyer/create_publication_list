@@ -2,27 +2,32 @@ from pylatexenc.latexencode import utf8tolatex
 import ads
 
 ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
-author_name = 'Mazoyer, Johan'  # your name
-name_short = 'Mazoyer'
-years = (2011, 2020) # years to be queried: (start year, end year)
-refereed = True # if True, only refereed publications will be queried;
+author_name = 'Mazoyer, Johan'  # last name, first name
+years = (1995, 2020) # years to be queried: (start year, end year)
+refereed = False # if True, only refereed publications will be queried;
                 # if False, only non-refereed publications will be queried
+
 
 if refereed:
     Name_doc = 'Refereed Publications'
 else:
     Name_doc = 'Conference Proceedings (SPIE, AO4ELT)'
+
+name_short = author_name.split(', ')[0]
+
+
 latex_header = (
     '\\documentclass[11pt]{article}\n'
     '\\usepackage[inner=1in,outer=1in,top=1in,bottom=1in]{geometry}\n'
+    '\\usepackage{etaremune}\n\n'
     '\\usepackage[usenames, dvipsnames]{xcolor}\n\n'
     '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n\n'
     '\\begin{document}\n\n'
     '\\section*{'+Name_doc+'}\n\n'
-    '\\begin{itemize}\itemsep 0pt\n')
+    '\\begin{etaremune} \itemsep 0pt\n')
 
 latex_footer = (
-    '\\end{itemize}\n'
+    '\\end{etaremune}\n'
     '\\end{document}\n')
 
 def query_papers(author, refereed=None, years=None, rows=1000):
@@ -89,7 +94,10 @@ def create_latex(paper, name=None):
             # `name` is the i-th author on this paper
             author = utf8tolatex(paper.author[i])
             nom = author.split(',')[0]
-            prenoms = author.split(',')[1]
+            if len(author.split(','))>1:
+                prenoms = author.split(',')[1]
+            else:
+                prenoms = '?'
             prenoms = prenoms.replace("-", " -")
             prenoms = prenoms.split(' ')
             while True:
@@ -122,22 +130,6 @@ def create_latex(paper, name=None):
                 etal = True
                 break
 
-            # else
-            # if name in author:
-            #     name_found = True
-            #     authors.append('{\\bf ' + author + '}')
-            # elif i >= 3 and not name_found and not dotdotdot:
-            #     # at least 3 authors and `name` is not among the first 3;
-            #     # insert '...'
-            #     authors.append('...\ ')
-            #     dotdotdot = True
-            # elif i <= 3 and not name_found and dotdotdot:
-            #     # at least 3 authors, but this one is not `name`
-            #     pass
-            # elif i >= 3 and name_found:
-            #     # at least 3 authors and this one is `name`
-            #     etal = True
-            #     break
 
     # join author list and add 'et al.' if required
     if etal:
