@@ -6,10 +6,8 @@ import ads
 
 ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
 author_name = 'Mazoyer, Johan'  # last name, first name
-years = (1995, 2030) # years to be queried: (start year, end year)
-refereed = True # if True, only refereed publications will be queried;
-                # if False, only non-refereed publications will be queried
-# french = False
+years = (2011, 2030) # years to be queried: (start year, end year)
+french = False
 
 
 
@@ -261,7 +259,7 @@ def create_latex_subpart(author_name, years, refereed=True, major=True, french=F
             latex_subpart = latex_subpart + ref + '\n\n '
     
     latex_subpart = latex_subpart + '\\end{etaremune}\n\n'
-    print(latex_subpart)
+    # print(latex_subpart)
     return latex_subpart
 
 def create_latex_subpart_these(french=False):
@@ -296,7 +294,7 @@ def create_latex_subpart_these(french=False):
             latex_subpart = latex_subpart + ref + '\n\n '
     
     latex_subpart = latex_subpart + '\\end{itemize}\n\n'
-    print(latex_subpart)
+    # print(latex_subpart)
     return latex_subpart
 
 def create_latex_files(author_name, years, french=False):
@@ -346,7 +344,7 @@ def create_latex_files(author_name, years, french=False):
         '\\end{document}\n')
 
 
-    print(name_file)
+    # print(name_file)
     with open(name_file, 'w') as outf:
         outf.write(latex_header + '\n\n')
         outf.write(create_latex_subpart(author_name, refereed=True, years=years, major = True, french = french)+ '\n\n')
@@ -360,24 +358,24 @@ def create_latex_files(author_name, years, french=False):
 
 if __name__ == '__main__':
     name_short = author_name.split(', ')[0]
-    create_latex_files(author_name, years=years, french = True)
-    time.sleep(5)
-    create_latex_files(author_name, years=years, french = False)
-    time.sleep(5)
-    os.system('latex publication_list_Mazoyer_fr.tex')
-    time.sleep(5)
-    os.system('latex publication_list_Mazoyer_en.tex')
-    time.sleep(5)
     
-    os.system('cp publication_list_Mazoyer_fr.pdf ../mywebpage/CV_publi_website/') 
-    os.system('cp publication_list_Mazoyer_en.pdf ../mywebpage/CV_publi_website/') 
+    for french in [True,False]:
+        if french:
+            name_publi = 'publication_list_Mazoyer_fr'
+            name_cv = 'CV_Mazoyer_fr'
+            name_combi = 'CV_publi_Mazoyer_fr'
+        else: 
+            name_publi = 'publication_list_Mazoyer_en'
+            name_cv = 'CV_Mazoyer_en'
+            name_combi = 'CV_publi_Mazoyer_en'
+        
+        create_latex_files(author_name, years=years, french = french)
+        time.sleep(5)
+        os.system('pdflatex ' +name_publi +'.tex')
+        time.sleep(5)
+        os.system('cp ' +name_publi+'.pdf ../mywebpage/CV_publi_website/') 
+        os.system('cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile='+name_combi+'.pdf ' + name_cv + '.pdf '+ name_publi+ '.pdf')
+        os.system('cd ../mywebpage/ && git add . && git commit -m "automatically update '+name_combi+ '.pdf' + ' " && git push')
 
+    os.system('rm *.aux && rm *.log && rm *.out')
 
-    command_concanate = 'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile=CV_publi_Mazoyer_FR.pdf CV_Mazoyer_FR.pdf publication_list_Mazoyer_fr.pdf'
-    os.system(command_concanate)
-    
-    command_concanate = 'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile=CV_publi_Mazoyer.pdf CV_Mazoyer.pdf publication_list_Mazoyer_en.pdf'
-
-    os.system(command_concanate)
-
-    os.system('rm *.aux && rm *.dvi && rm *.log && rm *.out && rm *.synctex.gz')
