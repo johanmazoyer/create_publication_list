@@ -1,34 +1,17 @@
+import os
+import time
 from pylatexenc.latexencode import utf8tolatex
 import ads
 
+
 ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
 author_name = 'Mazoyer, Johan'  # last name, first name
-years = (1995, 2020) # years to be queried: (start year, end year)
-refereed = False # if True, only refereed publications will be queried;
+years = (1995, 2030) # years to be queried: (start year, end year)
+refereed = True # if True, only refereed publications will be queried;
                 # if False, only non-refereed publications will be queried
+# french = False
 
 
-if refereed:
-    Name_doc = 'Refereed Publications'
-else:
-    Name_doc = 'Conference Proceedings (SPIE, AO4ELT)'
-
-name_short = author_name.split(', ')[0]
-
-
-latex_header = (
-    '\\documentclass[11pt]{article}\n'
-    '\\usepackage[inner=1in,outer=1in,top=1in,bottom=1in]{geometry}\n'
-    '\\usepackage{etaremune}\n\n'
-    '\\usepackage[usenames, dvipsnames]{xcolor}\n\n'
-    '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n\n'
-    '\\begin{document}\n\n'
-    '\\section*{'+Name_doc+'}\n\n'
-    '\\begin{etaremune} \itemsep 0pt\n')
-
-latex_footer = (
-    '\\end{etaremune}\n'
-    '\\end{document}\n')
 
 def query_papers(author, refereed=None, years=None, rows=1000):
     """query papers from NASA ADS
@@ -65,8 +48,8 @@ def query_papers(author, refereed=None, years=None, rows=1000):
 
     return list(papers)
 
-def create_latex(paper, name=None):
-    """turn ads publication objects into strings using latex encoding
+def create_paper_latex_line(paper, name=None):
+    """create the latex document in strings using latex encoding
 
     :param paper: ads publication object
     :param name: string or `None`, name that will be highlighted in latex,
@@ -184,7 +167,7 @@ def create_latex(paper, name=None):
 
     return out
 
-def fixme(out):
+def fixme(latex_string):
     """fix/reject citation substrings
 
     :param out: string containing publication information
@@ -196,9 +179,9 @@ def fixme(out):
     reject = ['Abstracts', 'European Planetary Science Congress','VizieR',
                 'arXiv e-prints',
                 'Bulletin of the American Astronomical Society',
-                'Lunar and Planetary Science Conference', 'AO4ELT']
+                'Thesis']
     for s in reject:
-        if s in out:
+        if s in latex_string:
             return ''
 
     # substrings to be replaced
@@ -207,28 +190,194 @@ def fixme(out):
            '─': '-',
            '': ''}
     for key, val in fix.items():
-        if key in out:
-            out = out.replace(key, val)
+        if key in latex_string:
+            latex_string = latex_string.replace(key, val)
 
-    out = out.replace('#', '\#')
+    latex_string = latex_string.replace('#', '\#')
 
-    return out
+    return latex_string
 
-# pull references from ads
-papers = query_papers(author_name, refereed=refereed, years=years)
-# write results to file
-if refereed:
-    ref = 'ref'
-else:
-    ref = 'proc'
+def major_or_minor(latex_string, major = True):
+    """sort major and minor publications
 
-name_file = 'publication_list_'+ref+'_'+name_short+'.tex'
-print(name_file)
-with open(name_file, 'w') as outf:
-    outf.write(latex_header + '\n\n')
+    :param out: string containing publication information
+
+    :return out: string
+    """
+    if major: 
+        if not name_short in latex_string:
+            return ''
+    else:
+        if name_short in latex_string:
+            return ''
+
+    return latex_string
+
+def create_latex_subpart(author_name, years, refereed=True, major=True, french=False):
+    """create a altex string for each subparts of the list
+
+    :param out: string containing publication information
+
+    :return out: latex string of a subpart
+    """
+
+    if refereed:
+        if french:
+            Name_doc = 'ARTICLES' 
+        else:
+            Name_doc = 'REFEREED PUBLICATIONS'
+    else:
+        if french:
+            Name_doc = 'ACTES DE CONFERENCES' 
+        else:
+            Name_doc = 'CONFERENCE PROCEEDINGS'
+    
+    if major:
+        if french:
+            Name_doc = 'PRINCIPAUX ' +Name_doc 
+        else:
+            Name_doc = 'MAJOR ' +  Name_doc 
+    else:
+        if french:
+            Name_doc = 'AUTRES ' +Name_doc 
+        else:
+            Name_doc = 'OTHER ' +  Name_doc 
+
+    latex_subpart =(
+        '\\vspace{-0.5cm}\n'
+        '\\textcolor{RoyalBlue}{\\section{'+Name_doc+'}\n'
+        '\\vspace{-0.25cm}\hrule}\n'
+        '\\vspace{0.6cm}\n\n'
+        '\\begin{etaremune} \itemsep 0pt\n\n'
+        )
+    
+    # pull references from ads
+    papers = query_papers(author_name, refereed=refereed, years=years)
+    
     for paper in list(papers):
-        ref = fixme(create_latex(paper, author_name))
+        ref = fixme(major_or_minor(create_paper_latex_line(paper, author_name), major = major))
         if len(ref) > 0:
             print(paper.author[0], paper.year)
-            outf.write(ref + '\n\n')
-    outf.write(latex_footer + '\n')
+            latex_subpart = latex_subpart + ref + '\n\n '
+    
+    latex_subpart = latex_subpart + '\\end{etaremune}\n\n'
+    print(latex_subpart)
+    return latex_subpart
+
+def create_latex_subpart_these(french=False):
+    """create a altex string just for my phd
+
+    :param out: string containing publication information
+
+    :return out: latex string of a subpart
+    """
+
+    if french:
+        Name_doc = 'MANUSCRIT DE THESE' 
+    else:
+        Name_doc = 'PHD THESIS'
+   
+
+    latex_subpart =(
+        '\\vspace{-0.5cm}\n'
+        '\\textcolor{RoyalBlue}{\\section{'+Name_doc+'}\n'
+        '\\vspace{-0.25cm}\hrule}\n'
+        '\\vspace{0.6cm}\n\n'
+        '\\begin{itemize} \itemsep 0pt\n\n'
+        )
+    
+    # pull references from ads
+    papers = query_papers('Mazoyer, Johan', years=(2014,2014))
+    
+    for paper in list(papers):
+        ref = create_paper_latex_line(paper, author_name)
+        if 'Thesis' in ref:
+            print(paper.author[0], paper.year)
+            latex_subpart = latex_subpart + ref + '\n\n '
+    
+    latex_subpart = latex_subpart + '\\end{itemize}\n\n'
+    print(latex_subpart)
+    return latex_subpart
+
+def create_latex_files(author_name, years, french=False):
+
+    if french:
+        lang = 'fr'
+        geom_string =  ('\\documentclass[11pt, a4paper, french]{article}\n'
+                        '\\usepackage[total={17.2cm,25.cm}, left=1.9cm, top=2.5cm]{geometry}\n'
+                        )
+        title_string = 'LISTE DES PUBLICATIONS'
+    else:
+        lang = 'en'
+        geom_string =  ('\\documentclass[11pt]{article}\n'
+                        '\\usepackage[total={6.5in,9in},left=1in,top=1in,headheight=110pt]{geometry} \n'
+                        )
+        title_string = 'PUBLICATION LIST'
+
+    name_file = 'publication_list_' + name_short + '_' +lang+'.tex'
+
+
+    
+
+
+
+
+
+    latex_header = (
+        geom_string+
+        '\\usepackage{etaremune}\n'
+        '\\usepackage[usenames, dvipsnames]{xcolor}\n'
+        '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n'
+        '\\usepackage{fancyhdr}\n'
+        '\\renewcommand{\\headrulewidth}{0pt}\n'
+        '\\pagestyle{fancy}\n'
+        '\\rhead{}\n'
+        '\\chead{}\n'
+        '\\cfoot{}\n'
+        '\\rfoot{\\href{http://johanmazoyer.com}{johanmazoyer.com}}\n\n'
+        '\\begin{document}\n\n'
+        '\\begin{center}\\begin{Large}\n'
+        '\\textbf{'+title_string+'}\n'
+        '\\end{Large}\\end{center}\n\n'
+        '\\setcounter{section}{0}\n\n'
+        )
+
+    latex_footer = (
+        '\\end{document}\n')
+
+
+    print(name_file)
+    with open(name_file, 'w') as outf:
+        outf.write(latex_header + '\n\n')
+        outf.write(create_latex_subpart(author_name, refereed=True, years=years, major = True, french = french)+ '\n\n')
+        outf.write(create_latex_subpart(author_name, refereed=True, years=years, major = False, french = french)+ '\n\n')
+        if name_short == 'Mazoyer':
+            outf.write(create_latex_subpart_these())
+        
+        outf.write(create_latex_subpart(author_name, refereed=False, years=years, major = True, french = french)+ '\n\n')
+        outf.write(create_latex_subpart(author_name, refereed=False, years=years, major = False, french = french)+ '\n\n')
+        outf.write(latex_footer + '\n')
+
+if __name__ == '__main__':
+    name_short = author_name.split(', ')[0]
+    create_latex_files(author_name, years=years, french = True)
+    time.sleep(5)
+    create_latex_files(author_name, years=years, french = False)
+    time.sleep(5)
+    os.system('latex publication_list_Mazoyer_fr.tex')
+    time.sleep(5)
+    os.system('latex publication_list_Mazoyer_en.tex')
+    time.sleep(5)
+    
+    os.system('cp publication_list_Mazoyer_fr.pdf ../mywebpage/CV_publi_website/') 
+    os.system('cp publication_list_Mazoyer_en.pdf ../mywebpage/CV_publi_website/') 
+
+
+    command_concanate = 'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile=CV_publi_Mazoyer_FR.pdf CV_Mazoyer_FR.pdf publication_list_Mazoyer_fr.pdf'
+    os.system(command_concanate)
+    
+    command_concanate = 'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile=CV_publi_Mazoyer.pdf CV_Mazoyer.pdf publication_list_Mazoyer_en.pdf'
+
+    os.system(command_concanate)
+
+    os.system('rm *.aux && rm *.dvi && rm *.log && rm *.out && rm *.synctex.gz')
