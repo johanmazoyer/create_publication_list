@@ -176,8 +176,7 @@ def fixme(latex_string):
     # words leading to a rejection
     reject = ['Abstracts', 'European Planetary Science Congress','VizieR',
                 'arXiv e-prints',
-                'Bulletin of the American Astronomical Society',
-                'Thesis']
+                'Thesis', 'Space Astrophysics Landscape']
     for s in reject:
         if s in latex_string:
             return ''
@@ -226,9 +225,9 @@ def create_latex_subpart(author_name, years, refereed=True, major=True, french=F
             Name_doc = 'REFEREED PUBLICATIONS'
     else:
         if french:
-            Name_doc = 'ACTES DE CONFERENCES' 
+            Name_doc = 'ACTES DE CONFERENCES \& PAPIERS BLANCS' 
         else:
-            Name_doc = 'CONFERENCE PROCEEDINGS'
+            Name_doc = 'CONFERENCE PROCEEDINGS \& WHITE PAPERS'
     
     if major:
         if french:
