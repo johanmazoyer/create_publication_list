@@ -3,12 +3,10 @@ import time
 from pylatexenc.latexencode import utf8tolatex
 import ads
 
-
 ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
 author_name = 'Mazoyer, Johan'  # last name, first name
-years = (2011, 2030) # years to be queried: (start year, end year)
+years = (2011, 2030)  # years to be queried: (start year, end year)
 french = False
-
 
 
 def query_papers(author, refereed=None, years=None, rows=1000):
@@ -41,17 +39,23 @@ def query_papers(author, refereed=None, years=None, rows=1000):
                              q=q,
                              sort='pubdate',
                              rows=rows,
-                             fl=['title', 'author', 'year', 'volume',
-                                 'page', 'pub', 'identifier', 'citation','doi'])
+                             fl=[
+                                 'title', 'author', 'year', 'volume', 'page',
+                                 'pub', 'identifier', 'citation', 'doi'
+                             ])
 
     return list(papers)
 
-def create_paper_latex_line(paper, name=None):
+
+def create_paper_latex_line(paper, name=None, Number_authors_written=3):
     """create the latex document in strings using latex encoding
 
     :param paper: ads publication object
     :param name: string or `None`, name that will be highlighted in latex,
                  default: `None`
+    param Number_authors_written: the number of authors displayed in the citation line
+                                    also used to defined what is an "major paper" if
+                                    the authors is in the first Number_authors_written authors
 
     :return: str, latex encoded string for paper
     """
@@ -62,8 +66,9 @@ def create_paper_latex_line(paper, name=None):
     # build author list
     if name is None:
         # treat all author names equally and list all of them
-        authors = [utf8tolatex(paper.author[i])
-                   for i in range(len(paper.author))]
+        authors = [
+            utf8tolatex(paper.author[i]) for i in range(len(paper.author))
+        ]
         etal = False
     else:
         # highlight `name` in output string, if provided
@@ -75,31 +80,31 @@ def create_paper_latex_line(paper, name=None):
             # `name` is the i-th author on this paper
             author = utf8tolatex(paper.author[i])
             nom = author.split(',')[0]
-            if len(author.split(','))>1:
+            if len(author.split(',')) > 1:
                 prenoms = author.split(',')[1]
             else:
                 prenoms = '?'
             prenoms = prenoms.replace("-", " -")
             prenoms = prenoms.split(' ')
             while True:
-                try :
+                try:
                     prenoms.remove('')
                 except ValueError:
                     break
-    
-            for prenomj, prenom  in enumerate(prenoms):
+
+            for prenomj, prenom in enumerate(prenoms):
                 if prenom[0] == '-':
-                    prenoms[prenomj] =  prenom[0:2] + '.'
+                    prenoms[prenomj] = prenom[0:2] + '.'
                 elif prenom[0] == '{':
                     end = prenom.find('}')
-                    prenoms[prenomj] = prenom[0:end+1] + '.'
+                    prenoms[prenomj] = prenom[0:end + 1] + '.'
                 else:
                     prenoms[prenomj] = prenom[0] + '.'
 
-            author = nom + ", "+" ".join(prenoms)
+            author = nom + ", " + " ".join(prenoms)
             #print(author)
-            
-            if i < 3:
+
+            if i < Number_authors_written:
                 if name_short in author:
                     authors.append('{\\bf ' + author + '}')
                 else:
@@ -110,7 +115,6 @@ def create_paper_latex_line(paper, name=None):
             else:
                 etal = True
                 break
-
 
     # join author list and add 'et al.' if required
     if etal:
@@ -134,11 +138,6 @@ def create_paper_latex_line(paper, name=None):
         # doi_link = ('\href{https://doi.org/' + paper.doi[0] + '}{doi.org/' + paper.doi[0] + '}')
         doi_link = ('\href{https://doi.org/' + paper.doi[0] + '}{DOI Link}')
 
-
-
-
-
-
     # arxiv_link = ''
     # for ident in paper.identifier:
     #     if 'ArXiv:' in ident:
@@ -150,8 +149,8 @@ def create_paper_latex_line(paper, name=None):
     #                       ident + '}{arxiv}')
 
     # assemble output string as latex bullet list item
-    out = ('\\item ' + authors + ' ({\\bf'   + year + '}), ' + title +
-           ', ' + pub)
+    out = ('\\item ' + authors + ' ({\\bf' + year + '}), ' + title + ', ' +
+           pub)
     if doi_link != '':
         out += ', ' + doi_link
     # if arxiv_link != '':
@@ -165,52 +164,95 @@ def create_paper_latex_line(paper, name=None):
 
     return out
 
-def fixme(latex_string):
-    """fix/reject citation substrings
+
+def reject_cit(latex_string, reject_kw=None):
+    """reject some citation substrings base on keywords
+
+    reject_kw: string list of keywords
+    param out: string containing publication information
+
+    return latex_string: string
+    """
+
+    if reject_kw is None:  # no rejection everything goes
+        return latex_string
+
+    for s in reject_kw:
+        if s in latex_string:
+            return ''
+
+    return latex_string
+
+
+def select_cit(latex_string, select_kw=None):
+    """reject some citation substrings base on keywords
+
+    reject_kw: string list of keywords
+    param out: string containing publication information
+
+    return latex_string: string
+    """
+
+    if select_kw is None:  # no selection everything goes
+        return latex_string
+
+    for s in select_kw:
+        if s in latex_string:
+            return latex_string
+
+    return ''
+
+
+def clean_string(latex_string):
+    """fix some citation substrings which is rejected by latex
 
     :param out: string containing publication information
 
     :return out: string
     """
-
-    # words leading to a rejection
-    reject = ['Abstracts', 'European Planetary Science Congress','VizieR',
-                'arXiv e-prints',
-                'Thesis', 'Space Astrophysics Landscape']
-    for s in reject:
-        if s in latex_string:
-            return ''
-
     # substrings to be replaced
-    fix = {'<SUB>': '',
-           '</SUB>': '',
-           '─': '-',
-           '': ''}
+    fix = {'<SUB>': '', '</SUB>': '', '─': '-', '': ''}
     for key, val in fix.items():
         if key in latex_string:
             latex_string = latex_string.replace(key, val)
 
     latex_string = latex_string.replace('#', '\#')
+    latex_string = latex_string.replace('&', '\&')
 
     return latex_string
 
-def major_or_minor(latex_string, major = True):
+
+def major_or_minor(latex_string, major=None):
     """sort major and minor publications
+    
+    :param latex_string: string containing publication information
+    param major:    if None, take all
+                    if True, only take the one where the author is in the first names
+                    if True, only take the one where the author is NOT in the first names
 
-    :param out: string containing publication information
-
-    :return out: string
+    :return latex_string: string
     """
-    if major: 
+    if major is None:
+        return latex_string
+    elif major:
         if not name_short in latex_string:
             return ''
-    else:
+    elif not major:
         if name_short in latex_string:
             return ''
 
     return latex_string
 
-def create_latex_subpart(author_name, years, refereed=True, major=True, french=False):
+
+def create_latex_subpart(author_name,
+                         years,
+                         Name_part='MY PAPERS',
+                         refereed=None,
+                         major=None,
+                         french=False,
+                         reject_kw=None,
+                         select_kw=None,
+                         bullet = 'itemize'):
     """create a altex string for each subparts of the list
 
     :param out: string containing publication information
@@ -218,111 +260,119 @@ def create_latex_subpart(author_name, years, refereed=True, major=True, french=F
     :return out: latex string of a subpart
     """
 
-    if refereed:
-        if french:
-            Name_doc = 'ARTICLES' 
-        else:
-            Name_doc = 'REFEREED PUBLICATIONS'
-    else:
-        if french:
-            Name_doc = 'ACTES DE CONFERENCES \& PAPIERS BLANCS' 
-        else:
-            Name_doc = 'CONFERENCE PROCEEDINGS \& WHITE PAPERS'
-    
-    if major:
-        if french:
-            Name_doc = 'PRINCIPAUX ' +Name_doc 
-        else:
-            Name_doc = 'MAJOR ' +  Name_doc 
-    else:
-        if french:
-            Name_doc = 'AUTRES ' +Name_doc 
-        else:
-            Name_doc = 'OTHER ' +  Name_doc 
+    latex_subpart = ('\\vspace{-0.5cm}\n'
+                     '\\textcolor{RoyalBlue}{\\section{' + Name_part + '}\n'
+                     '\\vspace{-0.25cm}\hrule}\n'
+                     '\\vspace{0.6cm}\n\n'
+                     '\\begin{' + bullet +'} \itemsep 0pt\n\n')
 
-    latex_subpart =(
-        '\\vspace{-0.5cm}\n'
-        '\\textcolor{RoyalBlue}{\\section{'+Name_doc+'}\n'
-        '\\vspace{-0.25cm}\hrule}\n'
-        '\\vspace{0.6cm}\n\n'
-        '\\begin{etaremune} \itemsep 0pt\n\n'
-        )
-    
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
-    
+    there_at_least_one_cit = False
+
     for paper in list(papers):
-        ref = fixme(major_or_minor(create_paper_latex_line(paper, author_name), major = major))
+        ref = clean_string(
+            select_cit(reject_cit(major_or_minor(create_paper_latex_line(
+                paper, author_name),
+                                                 major=major),
+                                  reject_kw=reject_kw),
+                       select_kw=select_kw))
+
         if len(ref) > 0:
+            there_at_least_one_cit = True
             print(paper.author[0], paper.year)
             latex_subpart = latex_subpart + ref + '\n\n '
-    
-    latex_subpart = latex_subpart + '\\end{etaremune}\n\n'
+
+    if not there_at_least_one_cit:
+        return ''
+
+    latex_subpart = latex_subpart + '\\end{'+bullet+'}\n\n'
     # print(latex_subpart)
     return latex_subpart
 
-def create_latex_subpart_these(french=False):
-    """create a altex string just for my phd
 
-    :param out: string containing publication information
+# def create_latex_subpart_these(french=False):
+#     """create a altex string just for my phd
 
-    :return out: latex string of a subpart
-    """
+#     :param out: string containing publication information
 
-    if french:
-        Name_doc = 'MANUSCRIT DE THESE' 
-    else:
-        Name_doc = 'PHD THESIS'
-   
+#     :return out: latex string of a subpart
+#     """
 
-    latex_subpart =(
-        '\\vspace{-0.5cm}\n'
-        '\\textcolor{RoyalBlue}{\\section{'+Name_doc+'}\n'
-        '\\vspace{-0.25cm}\hrule}\n'
-        '\\vspace{0.6cm}\n\n'
-        '\\begin{itemize} \itemsep 0pt\n\n'
-        )
-    
-    # pull references from ads
-    papers = query_papers('Mazoyer, Johan', years=(2014,2014))
-    
-    for paper in list(papers):
-        ref = create_paper_latex_line(paper, author_name)
-        if 'Thesis' in ref:
-            print(paper.author[0], paper.year)
-            latex_subpart = latex_subpart + ref + '\n\n '
-    
-    latex_subpart = latex_subpart + '\\end{itemize}\n\n'
-    # print(latex_subpart)
-    return latex_subpart
+#     if french:
+#         Name_part = 'MANUSCRIT DE THESE'
+#     else:
+#         Name_part = 'TOTO'
+
+#     latex_subpart = ('\\vspace{-0.7cm}\n'
+#                      '\\textcolor{RoyalBlue}{\\section{' + Name_part + '}\n'
+#                      '\\vspace{-0.25cm}\hrule}\n'
+#                      '\\vspace{0.6cm}\n\n'
+#                      '\\begin{itemize} \itemsep 0pt\n\n')
+
+#     # pull references from ads
+#     papers = query_papers('Mazoyer, Johan', years=(2014, 2014), refereed=None)
+
+#     for paper in list(papers):
+#         ref = clean_string(create_paper_latex_line(paper, 'Mazoyer, Johan'))
+#         print('subpartthese asdasd',ref)
+#         if 'Thesis' in ref:
+#             print(paper.author[0], paper.year)
+#             latex_subpart = latex_subpart + ref + '\n\n'
+
+#     latex_subpart = latex_subpart + '\\end{itemize}\n\n'
+#     # print(latex_subpart)
+#     return latex_subpart
+
 
 def create_latex_files(author_name, years, french=False):
 
     if french:
+        Name_ref_imp = 'PRINCIPAUX ARTICLES'
+        Name_nonref_imp = 'PRINCIPAUX ACTES DE CONFERENCES'
+        Name_ref_nonimp = 'AUTRES ARTICLES'
+        Name_nonref_nonimp = 'AUTRES ACTES DE CONFERENCES'
+
+        Name_wp_imp = 'PAPIERS BLANCS (SELECTION)'
+        # Name_wp_imp = 'Papiers blancs (selections)'
+
+        Name_these = 'MANUSCRIT DE THESE'
+
         lang = 'fr'
-        geom_string =  ('\\documentclass[11pt, a4paper, french]{article}\n'
-                        '\\usepackage[total={17.2cm,25.cm}, left=1.9cm, top=2.5cm]{geometry}\n'
-                        )
+        geom_string = (
+            '\\documentclass[11pt, a4paper, french]{article}\n'
+            '\\usepackage[total={17.2cm,25.cm}, left=1.9cm, top=2.5cm]{geometry}\n'
+        )
         title_string = 'LISTE DES PUBLICATIONS'
+
     else:
+        Name_ref_imp = 'MAJOR REFEREED PUBLICATIONS'
+        Name_nonref_imp = 'MAJOR CONFERENCE PROCEEDINGS'
+        Name_ref_nonimp = 'OTHER REFEREED PUBLICATIONS'
+        Name_nonref_nonimp = 'OTHER CONFERENCE PROCEEDINGS'
+
+        Name_wp_imp = 'WHITE PAPERS (SELECTED)'
+
+        Name_these = 'PHD THESIS'
+
         lang = 'en'
-        geom_string =  ('\\documentclass[11pt]{article}\n'
-                        '\\usepackage[total={6.5in,9in},left=1in,top=1in,headheight=110pt]{geometry} \n'
-                        )
+        geom_string = (
+            '\\documentclass[11pt]{article}\n'
+            '\\usepackage[total={6.5in,9in},left=1in,top=1in,headheight=110pt]{geometry} \n'
+        )
         title_string = 'PUBLICATION LIST'
 
-    name_file = 'publication_list_' + name_short + '_' +lang+'.tex'
+    # words leading to a rejections for papers and proc parts (proposal, abstracts, conference w/o proc)
+    reject_kw_papers = [
+        'Abstracts', 'European Planetary Science Congress', 'VizieR',
+        'arXiv e-prints', 'Thesis', 'Space Astrophysics Landscape',
+        'Bulletin of the American Astronomical Society'
+    ]
 
-
-    
-
-
-
-
+    name_file = 'publication_list_' + name_short + '_' + lang + '.tex'
 
     latex_header = (
-        geom_string+
-        '\\usepackage{etaremune}\n'
+        geom_string + '\\usepackage{etaremune}\n'
         '\\usepackage[usenames, dvipsnames]{xcolor}\n'
         '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n'
         '\\usepackage{fancyhdr}\n'
@@ -334,47 +384,100 @@ def create_latex_files(author_name, years, french=False):
         '\\rfoot{\\href{http://johanmazoyer.com}{johanmazoyer.com}}\n\n'
         '\\begin{document}\n\n'
         '\\begin{center}\\begin{Large}\n'
-        '\\textbf{'+title_string+'}\n'
+        '\\textbf{' + title_string + '}\n'
         '\\end{Large}\\end{center}\n\n'
-        '\\setcounter{section}{0}\n\n'
-        )
+        '\\setcounter{section}{0}\n\n')
 
-    latex_footer = (
-        '\\end{document}\n')
-
+    latex_footer = ('\\end{document}\n')
 
     # print(name_file)
     with open(name_file, 'w') as outf:
         outf.write(latex_header + '\n\n')
-        outf.write(create_latex_subpart(author_name, refereed=True, years=years, major = True, french = french)+ '\n\n')
-        outf.write(create_latex_subpart(author_name, refereed=True, years=years, major = False, french = french)+ '\n\n')
-        if name_short == 'Mazoyer':
-            outf.write(create_latex_subpart_these())
+        outf.write(
+            create_latex_subpart(author_name,
+                                 Name_part=Name_ref_imp,
+                                 refereed=True,
+                                 years=years,
+                                 major=True,
+                                 reject_kw=reject_kw_papers,
+                                 bullet = 'enumerate',
+                                 french=french))
+        outf.write(
+            create_latex_subpart(author_name,
+                                 Name_part=Name_ref_nonimp,
+                                 refereed=True,
+                                 years=years,
+                                 major=False,
+                                 reject_kw=reject_kw_papers,
+                                 bullet = 'enumerate',
+                                 french=french))
+
         
-        outf.write(create_latex_subpart(author_name, refereed=False, years=years, major = True, french = french)+ '\n\n')
-        outf.write(create_latex_subpart(author_name, refereed=False, years=years, major = False, french = french)+ '\n\n')
+        outf.write(
+            create_latex_subpart(author_name,
+                                 Name_part=Name_these,
+                                 years=(2014, 2014),
+                                 reject_kw=None,
+                                 select_kw=['Thesis'],
+                                 bullet = 'itemize',
+                                 french=french))
+        
+        outf.write(
+            create_latex_subpart(author_name,
+                                 Name_part=Name_nonref_imp,
+                                 refereed=False,
+                                 years=years,
+                                 major=True,
+                                 reject_kw=reject_kw_papers,
+                                 bullet = 'enumerate',
+                                 french=french))
+        outf.write(
+            create_latex_subpart(author_name,
+                                 Name_part=Name_nonref_nonimp,
+                                 refereed=False,
+                                 years=years,
+                                 major=False,
+                                 reject_kw=reject_kw_papers,
+                                 bullet = 'enumerate',
+                                 french=french))
+        
+        outf.write(
+            create_latex_subpart(author_name,
+                                 Name_part=Name_wp_imp,
+                                 refereed=False,
+                                 years=(2019,2020),
+                                 major=None,
+                                 select_kw = ['SPHERE+','HabEx','High-Contrast Testbeds for Future'],
+                                 reject_kw = None,
+                                 bullet = 'itemize',
+                                 french=french))
+        
         outf.write(latex_footer + '\n')
+
 
 if __name__ == '__main__':
     name_short = author_name.split(', ')[0]
-    
-    for french in [True,False]:
+
+    for french in [True, False]:
         if french:
             name_publi = 'publication_list_Mazoyer_fr'
             name_cv = 'CV_Mazoyer_fr'
             name_combi = 'CV_publi_Mazoyer_fr'
-        else: 
+        else:
             name_publi = 'publication_list_Mazoyer_en'
             name_cv = 'CV_Mazoyer_en'
             name_combi = 'CV_publi_Mazoyer_en'
-        
-        create_latex_files(author_name, years=years, french = french)
-        time.sleep(5)
-        os.system('pdflatex ' +name_publi +'.tex')
-        time.sleep(5)
-        os.system('cp ' +name_publi+'.pdf ../mywebpage/CV_publi_website/') 
-        os.system('cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile='+name_combi+'.pdf ' + name_cv + '.pdf '+ name_publi+ '.pdf')
-        os.system('cd ../mywebpage/ && git add . && git commit -m "automatically update '+name_combi+ '.pdf' + ' " && git push')
 
+        create_latex_files(author_name, years=years, french=french)
+        os.system('pdflatex ' + name_publi + '.tex')
+
+    #     time.sleep(5)
+    #     os.system('pdflatex ' +name_publi +'.tex')
+    #     time.sleep(5)
+    #     os.system('pdflatex ' +name_publi +'.tex')
+    #     time.sleep(5)
+    #     os.system('cp ' +name_publi+'.pdf ../mywebpage/CV_publi_website/')
+    #     os.system('cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile='+name_combi+'.pdf ' + name_cv + '.pdf '+ name_publi+ '.pdf')
+
+    # # os.system('cd ../mywebpage/ && git add . && git commit -m "automatically update list publications" && git push')
     os.system('rm *.aux && rm *.log && rm *.out')
-
