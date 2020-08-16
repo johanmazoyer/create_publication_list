@@ -356,7 +356,7 @@ def create_latex_files(author_name, years, french=False):
     reject_kw_papers = [
         'Abstracts', 'European Planetary Science Congress', 'VizieR',
         'arXiv e-prints', 'Thesis', 'Space Astrophysics Landscape',
-        'Bulletin of the American Astronomical Society'
+        'Bulletin of the American Astronomical Society','Thirty years of Beta Pic'
     ]
     
     name_short = author_name.split(', ')[0]
@@ -469,7 +469,7 @@ if __name__ == '__main__':
         time.sleep(5)
         os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
         os.system(
-            'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -q -sDEVICE=pdfwrite -sOutputFile='
+            'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
             + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
 
     os.system(
