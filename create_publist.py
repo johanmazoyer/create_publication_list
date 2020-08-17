@@ -368,6 +368,7 @@ def create_latex_files(author_name, years, french=False):
         '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n'
         '\\usepackage{fancyhdr}\n'
         '\\renewcommand{\\headrulewidth}{0pt}\n'
+        '\\usepackage[nobottomtitles]{titlesec}\n'
         '\\pagestyle{fancy}\n'
         '\\rhead{}\n'
         '\\chead{}\n'
