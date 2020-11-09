@@ -315,7 +315,7 @@ def create_latex_subpart_manually(Name_part='MY PAPERS',
     return latex_subpart
 
 
-def create_latex_files(author_name, years, french=False):
+def create_latex_files(author_name, years, french=False, wp_sec_mazoyer = False, phd_sec = False):
 
     if french:
         Name_ref_imp = 'PRINCIPAUX ARTICLES'
@@ -401,14 +401,14 @@ def create_latex_files(author_name, years, french=False):
                                  major=False,
                                  reject_kw=reject_kw_papers,
                                  bullet='enumerate'))
-
-        outf.write(
-            create_latex_subpart(author_name,
-                                 Name_part=Name_these,
-                                 years=(2014, 2014),
-                                 reject_kw=None,
-                                 select_kw=['Thesis'],
-                                 bullet='itemize'))
+        if phd_sec:
+            outf.write(
+                create_latex_subpart(author_name,
+                                    Name_part=Name_these,
+                                    years=(2014, 2014),
+                                    reject_kw=None,
+                                    select_kw=['Thesis'],
+                                    bullet='itemize'))
 
         outf.write(
             create_latex_subpart(author_name,
@@ -427,53 +427,57 @@ def create_latex_files(author_name, years, french=False):
                                  reject_kw=reject_kw_papers,
                                  bullet='enumerate'))
 
-        ref_wp = [
-            '\\item Boccaletti, A. ; Chauvin, G. ; Mouillet, D. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
-            '\\item Gaudi, B. S. ; Seager, S. ; Mennesson, B. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
-            '\\item The LUVOIR Team ({\\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}',
-            '\\item {\\bf  Mazoyer, J.} ; Baudoz, P. ; Belikov, R. et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
-        ]
+        if wp_sec_mazoyer:
+            ref_wp = [
+                '\\item Boccaletti, A. ; Chauvin, G. ; Mouillet, D. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
+                '\\item Gaudi, B. S. ; Seager, S. ; Mennesson, B. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
+                '\\item The LUVOIR Team ({\\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}',
+                '\\item {\\bf  Mazoyer, J.} ; Baudoz, P. ; Belikov, R. et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
+            ]
 
-        outf.write(
-            create_latex_subpart_manually(Name_part=Name_wp_imp,
-                                          list_ref=ref_wp))
+            outf.write(
+                create_latex_subpart_manually(Name_part=Name_wp_imp,
+                                            list_ref=ref_wp))
         outf.write(latex_footer + '\n')
 
 
 if __name__ == '__main__':
 
     ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
-    author_name = 'Mazoyer, Johan'  # last name, first name
+    author_name = 'Mazoyer,  Johan'  # last name, first name
     years = (2011, 2030)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False # True French, False English, default is false
     Number_authors_displayed=3
-    
 
-    for french in [True, False]:
-        if french:
-            name_publi = 'publication_list_Mazoyer_fr'
-            name_cv = 'CV_Mazoyer_fr'
-            name_combi = 'CV_publi_Mazoyer_fr'
-        else:
-            name_publi = 'publication_list_Mazoyer_en'
-            name_cv = 'CV_Mazoyer_en'
-            name_combi = 'CV_publi_Mazoyer_en'
+    lang = '_fr' if french else '_en'
+    name_publi = 'publication_list_' + author_name.split(',')[0]+ lang
+    create_latex_files(author_name, years=years, french=french)
+    os.system('pdflatex ' + name_publi + '.tex')
+    os.system('rm *.aux && rm *.log && rm *.out')
+
+    ### For me
+    # for french in [True, False]:
+    #     lang = '_fr' if french else '_en'
+
+    #     name_publi = 'publication_list_Mazoyer' + lang
+    #     name_cv = 'CV_Mazoyer' + lang
+    #     name_combi = 'CV_publi_Mazoyer' + lang
 
         
-        create_latex_files(author_name, years=years, french=french)
-        os.system('pdflatex ' + name_publi + '.tex')
+    #     create_latex_files(author_name, years=years, french=french, wp_sec_mazoyer = True, phd_sec = True)
+    #     os.system('pdflatex ' + name_publi + '.tex')
 
-        time.sleep(5)
-        os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(5)
-        os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(5)
-        os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
-        os.system(
-            'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
-            + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
+    #     time.sleep(5)
+    #     os.system('pdflatex ' + name_publi + '.tex')
+    #     time.sleep(5)
+    #     os.system('pdflatex ' + name_publi + '.tex')
+    #     time.sleep(5)
+    #     os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
+    #     os.system(
+    #         'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
+    #         + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
 
-    os.system(
-        'cd ../mywebpage/ && git add . && git commit -m "automatically update list publications" && git push'
-    )
-    os.system('rm *.aux && rm *.log && rm *.out')
+    # os.system(
+    #     'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
+    # )
+    # os.system('rm *.aux && rm *.log && rm *.out')
