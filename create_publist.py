@@ -315,7 +315,7 @@ def create_latex_subpart_manually(Name_part='MY PAPERS',
     return latex_subpart
 
 
-def create_latex_files(author_name, years, french=False, wp_sec_mazoyer = False, phd_sec = False):
+def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec_mazoyer = False):
 
     if french:
         Name_ref_imp = 'PRINCIPAUX ARTICLES'
@@ -352,6 +352,12 @@ def create_latex_files(author_name, years, french=False, wp_sec_mazoyer = False,
         )
         title_string = 'PUBLICATION LIST'
 
+    if author_name.split(',')[0] == 'Mazoyer' or author_name.split(',')[0] == 'mazoyer':
+        rfoot = '\\href{http://johanmazoyer.com}{johanmazoyer.com}'
+        wp_sec_mazoyer = True
+    else:
+        rfoot = author_name
+
     # words leading to a rejections for papers and proc parts (proposal, abstracts, conference w/o proc)
     reject_kw_papers = [
         'Abstracts', 'European Planetary Science Congress', 'VizieR',
@@ -373,7 +379,7 @@ def create_latex_files(author_name, years, french=False, wp_sec_mazoyer = False,
         '\\rhead{}\n'
         '\\chead{}\n'
         '\\cfoot{}\n'
-        '\\rfoot{\\href{http://johanmazoyer.com}{johanmazoyer.com}}\n\n'
+        '\\rfoot{'+rfoot+'}\n\n'
         '\\begin{document}\n\n'
         '\\begin{center}\\begin{Large}\n'
         '\\textbf{' + title_string + '}\n'
@@ -444,9 +450,9 @@ def create_latex_files(author_name, years, french=False, wp_sec_mazoyer = False,
 if __name__ == '__main__':
 
     ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
-    author_name = 'Mazoyer,  Johan'  # last name, first name
+    author_name = 'Laginja,  Iva'  # last name, first name
     years = (2011, 2030)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
-    french = False # True French, False English, default is false
+    french = False # True French, False English. Default is false (English)
     Number_authors_displayed=3
 
     lang = '_fr' if french else '_en'
