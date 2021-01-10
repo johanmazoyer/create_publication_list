@@ -450,8 +450,8 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
 if __name__ == '__main__':
 
     ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
-    author_name = 'Laginja,  Iva'  # last name, first name
-    years = (2011, 2030)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
+    author_name = 'Mazoyer,  Johan'  # last name, first name
+    years = (2011, 2040)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False # True French, False English. Default is false (English)
     Number_authors_displayed=3
 
@@ -462,28 +462,28 @@ if __name__ == '__main__':
     os.system('rm *.aux && rm *.log && rm *.out')
 
     ### For me
-    # for french in [True, False]:
-    #     lang = '_fr' if french else '_en'
+    for french in [True, False]:
+        lang = '_fr' if french else '_en'
 
-    #     name_publi = 'publication_list_Mazoyer' + lang
-    #     name_cv = 'CV_Mazoyer' + lang
-    #     name_combi = 'CV_publi_Mazoyer' + lang
+        name_publi = 'publication_list_Mazoyer' + lang
+        name_cv = 'CV_Mazoyer' + lang
+        name_combi = 'CV_publi_Mazoyer' + lang
 
         
-    #     create_latex_files(author_name, years=years, french=french, wp_sec_mazoyer = True, phd_sec = True)
-    #     os.system('pdflatex ' + name_publi + '.tex')
+        create_latex_files(author_name, years=years, french=french, wp_sec_mazoyer = True, phd_sec = True)
+        os.system('pdflatex ' + name_publi + '.tex')
 
-    #     time.sleep(5)
-    #     os.system('pdflatex ' + name_publi + '.tex')
-    #     time.sleep(5)
-    #     os.system('pdflatex ' + name_publi + '.tex')
-    #     time.sleep(5)
-    #     os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
-    #     os.system(
-    #         'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
-    #         + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
+        time.sleep(5)
+        os.system('pdflatex ' + name_publi + '.tex')
+        time.sleep(5)
+        os.system('pdflatex ' + name_publi + '.tex')
+        time.sleep(5)
+        os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
+        os.system(
+            'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
+            + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
 
-    # os.system(
-    #     'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
-    # )
-    # os.system('rm *.aux && rm *.log && rm *.out')
+    os.system(
+        'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
+    )
+    os.system('rm *.aux && rm *.log && rm *.out')
