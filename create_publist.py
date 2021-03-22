@@ -3,6 +3,9 @@ import time
 from pylatexenc.latexencode import utf8tolatex
 import ads
 
+# based and adapted from a code from Michael Mommert:
+# https://mommermi.github.io/software/2019/01/27/generating-latex-publication-lists-from-nasa-ads.html
+
 
 def query_papers(author, refereed=None, years=None, rows=1000):
     """query papers from NASA ADS
