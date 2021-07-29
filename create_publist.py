@@ -363,7 +363,7 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
 
     # words leading to a rejections for papers and proc parts (proposal, abstracts, conference w/o proc)
     reject_kw_papers = [
-        'Abstracts', 'European Planetary Science Congress', 'VizieR',
+        'Abstracts', 'European Planetary Science Congress', 'VizieR', 'JWST Proposal',
         'arXiv e-prints', 'Thesis', 'Space Astrophysics Landscape',
         'Bulletin of the American Astronomical Society','Thirty years of Beta Pic'
     ]
