@@ -258,11 +258,11 @@ def create_latex_subpart(author_name,
     :return out: latex string of a subpart
     """
 
-    latex_subpart = ('\\vspace{-0.5cm}\n'
+    latex_subpart = ('\\vspace{-0.9cm}\n'
                      '\\textcolor{RoyalBlue}{\\section{' + Name_part + '}\n'
-                     '\\vspace{-0.25cm}\hrule}\n'
-                     '\\vspace{0.6cm}\n\n'
-                     '\\begin{' + bullet + '} \itemsep 0pt\n\n')
+                     '\\vspace{-0.35cm}\hrule}\n'
+                     '\\vspace{0.4cm}\n\n'
+                     '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
@@ -299,11 +299,11 @@ def create_latex_subpart_manually(Name_part='MY PAPERS',
     :return out: latex string of a subpart
     """
 
-    latex_subpart = ('\\vspace{-0.5cm}\n'
+    latex_subpart = ('\\vspace{-0.9cm}\n'
                      '\\textcolor{RoyalBlue}{\\section{' + Name_part + '}\n'
-                     '\\vspace{-0.25cm}\hrule}\n'
-                     '\\vspace{0.6cm}\n\n'
-                     '\\begin{' + bullet + '} \itemsep 0pt\n\n')
+                     '\\vspace{-0.35cm}\hrule}\n'
+                     '\\vspace{0.4cm}\n\n'
+                     '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
     there_at_least_one_cit = False
 
@@ -334,7 +334,7 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
 
         lang = 'fr'
         geom_string = (
-            '\\documentclass[11pt, a4paper, french]{article}\n'
+            '\\documentclass[10pt, a4paper, french]{article}\n'
             '\\usepackage[total={17.2cm,25.cm}, left=1.9cm, top=2.5cm]{geometry}\n'
         )
         title_string = 'LISTE DES PUBLICATIONS'
@@ -351,7 +351,7 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
 
         lang = 'en'
         geom_string = (
-            '\\documentclass[11pt]{article}\n'
+            '\\documentclass[10pt]{article}\n'
             '\\usepackage[total={6.5in,9in},left=1in,top=1in,headheight=110pt]{geometry} \n'
         )
         title_string = 'PUBLICATION LIST'
