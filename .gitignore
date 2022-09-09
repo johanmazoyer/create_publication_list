@@ -3,3 +3,5 @@
 *.synctex.gz
 .DS_Store
 *json
+*.fdb_latexmk
+*.fls

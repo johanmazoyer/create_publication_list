@@ -264,6 +264,16 @@ def create_latex_subpart(author_name,
                      '\\vspace{0.4cm}\n\n'
                      '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
+    # if you want to add recently accepted / submitted papers, you can do it here
+    # for exampleyou can run without exluding 'arXiv e-prints', take the ones you are interested in the tex files
+    # add them here and then run again excluding 'arXiv e-prints'
+    # if major and refereed:
+    #     latex_subpart += "\item Potier, A. ; {\\bf Mazoyer, J.} ; Wahhaj, Z. et al. ({\\bf 2022}), {\it Increasing the raw contrast of VLT/SPHERE with the dark-hole technique. II. On-sky wavefront correction and coherent differential imaging}, (accepted in Astronomy and Astrophysics), arXiv:2208.11244 \n"
+    
+    # if not major and refereed:
+    #     latex_subpart += "\item Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2022}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, (submitted) arXiv:2209.00620 \n"
+    #     latex_subpart += "\item Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2022}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 {\$}{\textbackslash}mu{\$}m}, (submitted) arXiv:2208.14990 \n"
+
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
     there_at_least_one_cit = False
@@ -365,8 +375,8 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
     # words leading to a rejections for papers and proc parts (proposal, abstracts, conference w/o proc)
     reject_kw_papers = [
         'Abstracts', 'European Planetary Science Congress', 'VizieR', 'JWST Proposal',
-        'arXiv e-prints', 'Thesis', 'Space Astrophysics Landscape',
-        'Bulletin of the American Astronomical Society','Thirty years of Beta Pic'
+        'Thesis', 'Space Astrophysics Landscape',
+        'Bulletin of the American Astronomical Society','Thirty years of Beta Pic','arXiv e-prints',
     ]
     
     name_short = author_name.split(', ')[0]
