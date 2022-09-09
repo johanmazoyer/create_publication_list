@@ -500,4 +500,4 @@ if __name__ == '__main__':
     os.system(
         'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
     )
-    os.system('rm *.aux && rm *.log && rm *.out')
+    os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
