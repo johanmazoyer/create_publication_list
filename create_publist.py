@@ -497,7 +497,7 @@ if __name__ == '__main__':
             'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
             + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
 
-    # os.system(
-    #     'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
-    # )
-    # os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
+    os.system(
+        'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
+    )
+    os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
