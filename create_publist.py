@@ -267,12 +267,12 @@ def create_latex_subpart(author_name,
     # if you want to add recently accepted / submitted papers, you can do it here
     # for exampleyou can run without exluding 'arXiv e-prints', take the ones you are interested in the tex files
     # add them here and then run again excluding 'arXiv e-prints'
-    # if major and refereed:
-    #     latex_subpart += "\item Potier, A. ; {\\bf Mazoyer, J.} ; Wahhaj, Z. et al. ({\\bf 2022}), {\it Increasing the raw contrast of VLT/SPHERE with the dark-hole technique. II. On-sky wavefront correction and coherent differential imaging}, (accepted in Astronomy and Astrophysics), arXiv:2208.11244 \n"
+    if major and refereed:
+        latex_subpart += "\item Galicher, R. {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n"
     
-    # if not major and refereed:
-    #     latex_subpart += "\item Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2022}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, (submitted) arXiv:2209.00620 \n"
-    #     latex_subpart += "\item Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2022}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 {\$}{\textbackslash}mu{\$}m}, (submitted) arXiv:2208.14990 \n"
+    if not major and refereed:
+        latex_subpart += "\item Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, (submitted to AJ) \href{https://doi.org/10.48550/arXiv.2209.00620}{arXiv:2209.00620} \n"
+        latex_subpart += "\item Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 microns}, (submitted to AJ) \href{https://doi.org/10.48550/arXiv.2208.14990}{arXiv:2208.14990} \n"
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
@@ -449,10 +449,10 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
 
         if wp_sec_mazoyer:
             ref_wp = [
-                '\\item Boccaletti, A. ; Chauvin, G. ; Mouillet, D. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
-                '\\item Gaudi, B. S. ; Seager, S. ; Mennesson, B. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
+                '\\item Boccaletti, A. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
+                '\\item Gaudi, B. S. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
                 '\\item The LUVOIR Team ({\\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}',
-                '\\item {\\bf  Mazoyer, J.} ; Baudoz, P. ; Belikov, R. et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
+                '\\item {\\bf  Mazoyer, J.} et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
             ]
 
             outf.write(
@@ -497,7 +497,7 @@ if __name__ == '__main__':
             'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
             + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
 
-    os.system(
-        'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
-    )
-    os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
+    # os.system(
+    #     'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
+    # )
+    # os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
