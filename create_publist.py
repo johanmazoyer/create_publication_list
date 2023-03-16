@@ -74,6 +74,11 @@ def create_paper_latex_line(paper, name=None, Number_authors_displayed=3):
         # name_found = False
         # dotdotdot = False
         etal = False
+        comma_or_and_between_authors = 'coma'
+
+        if len(paper.author) == 2:
+            comma_or_and_between_authors = 'and'
+
         for i in range(len(paper.author)):
             # `name` is the i-th author on this paper
             author = utf8tolatex(paper.author[i])
@@ -119,8 +124,11 @@ def create_paper_latex_line(paper, name=None, Number_authors_displayed=3):
     if etal:
         authors = ' ; '.join(authors) + ' et al.'
     else:
+        if comma_or_and_between_authors == 'coma':
+            authors = ' ; '.join(authors)
+        else:
+            authors = ' \\altand~'.join(authors)
 
-        authors = ' ; '.join(authors)
     year = paper.year
 
     # create string with journal volume and page number
@@ -268,7 +276,7 @@ def create_latex_subpart(author_name,
     # for exampleyou can run without exluding 'arXiv e-prints', take the ones you are interested in the tex files
     # add them here and then run again excluding 'arXiv e-prints'
     if major and refereed:
-        latex_subpart += "\item Galicher, R. {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n"
+        latex_subpart += "\item Galicher, R. \& {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n"
     
     if not major and refereed:
         latex_subpart += "\item Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, (submitted to AJ) \href{https://doi.org/10.48550/arXiv.2209.00620}{arXiv:2209.00620} \n"
@@ -388,6 +396,7 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
         '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n'
         '\\usepackage{fancyhdr}\n'
         '\\renewcommand{\\headrulewidth}{0pt}\n'
+        '\\newcommand\\altand{\&}\n'
         '\\usepackage[nobottomtitles]{titlesec}\n'
         '\\pagestyle{fancy}\n'
         '\\rhead{}\n'
@@ -421,14 +430,6 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
                                  major=False,
                                  reject_kw=reject_kw_papers,
                                  bullet='enumerate'))
-        if phd_sec:
-            outf.write(
-                create_latex_subpart(author_name,
-                                    Name_part=Name_these,
-                                    years=(2014, 2014),
-                                    reject_kw=None,
-                                    select_kw=['Thesis'],
-                                    bullet='itemize'))
 
         outf.write(
             create_latex_subpart(author_name,
@@ -458,6 +459,16 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
             outf.write(
                 create_latex_subpart_manually(Name_part=Name_wp_imp,
                                             list_ref=ref_wp))
+        
+        if phd_sec:
+            outf.write(
+                create_latex_subpart(author_name,
+                                    Name_part=Name_these,
+                                    years=(2014, 2014),
+                                    reject_kw=None,
+                                    select_kw=['Thesis'],
+                                    bullet='itemize'))
+            
         outf.write(latex_footer + '\n')
 
 
