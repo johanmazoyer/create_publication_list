@@ -276,13 +276,13 @@ def create_latex_subpart(author_name,
     # for exampleyou can run without exluding 'arXiv e-prints', take the ones you are interested in the tex files
     # add them here and then run again excluding 'arXiv e-prints'
     # you can use \item[$\\bullet$] to avoid numbering them if they are not eccepted yet
-    
+
     if major and refereed:
         latex_subpart += "\item Galicher, R. \& {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n"
     
     if not major and refereed:
-        latex_subpart += "\item[$\\bullet$] Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, (submitted to AJ) \href{https://doi.org/10.48550/arXiv.2209.00620}{arXiv:2209.00620} \n"
-        latex_subpart += "\item[$\\bullet$] Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 microns}, (submitted to AJ) \href{https://doi.org/10.48550/arXiv.2208.14990}{arXiv:2208.14990} \n"
+        latex_subpart += "\item[$\\bullet$] Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, {\\bf (submitted to AJ)} \href{https://doi.org/10.48550/arXiv.2209.00620}{arXiv:2209.00620} \n"
+        latex_subpart += "\item[$\\bullet$] Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 microns}, {\\bf (submitted to AJ)} \href{https://doi.org/10.48550/arXiv.2208.14990}{arXiv:2208.14990} \n"
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
