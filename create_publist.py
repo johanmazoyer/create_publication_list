@@ -278,10 +278,9 @@ def create_latex_subpart(author_name,
     # you can use \item[$\\bullet$] to avoid numbering them if they are not eccepted yet
 
     if major and refereed:
-        latex_subpart += "\item Galicher, R. \& {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n"
-    
+        bool_inject_CRPhys = True
+
     if not major and refereed:
-        latex_subpart += "\item[$\\bullet$] Miles, B. E. ; Biller, B. A. ; Patapis, P. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems II: A 1 to 20 Micron Spectrum of the Planetary-Mass Companion VHS 1256-1257 b}, {\\bf (submitted to AJ)} \href{https://doi.org/10.48550/arXiv.2209.00620}{arXiv:2209.00620} \n"
         latex_subpart += "\item[$\\bullet$] Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 microns}, {\\bf (submitted to AJ)} \href{https://doi.org/10.48550/arXiv.2208.14990}{arXiv:2208.14990} \n"
 
     # pull references from ads
@@ -298,6 +297,13 @@ def create_latex_subpart(author_name,
 
         if len(ref) > 0:
             there_at_least_one_cit = True
+
+            # we manually add the review written in Comptes Rendus. Physique since it appears as
+            # ArXiv in ADS and not as refereed. We only insert once as the first paper from 2023.
+            if major and refereed and int(paper.year) < 2023 and bool_inject_CRPhys :
+                latex_subpart += "\item Galicher, R. \& {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n\n"
+                bool_inject_CRPhys = False
+
             print(paper.author[0], paper.year)
             latex_subpart = latex_subpart + ref + '\n\n '
 
@@ -511,6 +517,6 @@ if __name__ == '__main__':
             + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
 
     os.system(
-        'cd ../mywebpage/ && git add . && git commit -m x"automatically update list publications" && git push'
+        'cd ../mywebpage/ && git add . && git commit -m "automatically update list publications" && git push'
     )
     os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
