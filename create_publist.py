@@ -267,8 +267,8 @@ def create_latex_subpart(author_name,
     """
 
     latex_subpart = ('\\vspace{-0.9cm}\n'
-                     '\\textcolor{RoyalBlue}{\\section{' + Name_part + '}\n'
-                     '\\vspace{-0.35cm}\hrule}\n'
+                     '\\textcolor{RoyalBlue}{\\section*{\large ' + Name_part + '}\n'
+                     '\\vspace{-0.3cm}\hrule}\n'
                      '\\vspace{0.4cm}\n\n'
                      '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
@@ -305,7 +305,7 @@ def create_latex_subpart(author_name,
                 bool_inject_CRPhys = False
 
             print(paper.author[0], paper.year)
-            latex_subpart = latex_subpart + ref + '\n\n '
+            latex_subpart = latex_subpart + ref + '\n\n'
 
     if not there_at_least_one_cit:
         return ''
@@ -326,8 +326,8 @@ def create_latex_subpart_manually(Name_part='MY PAPERS',
     """
 
     latex_subpart = ('\\vspace{-0.9cm}\n'
-                     '\\textcolor{RoyalBlue}{\\section{' + Name_part + '}\n'
-                     '\\vspace{-0.35cm}\hrule}\n'
+                     '\\textcolor{RoyalBlue}{\\section*{\large ' + Name_part + '}\n'
+                     '\\vspace{-0.3cm}\hrule}\n'
                      '\\vspace{0.4cm}\n\n'
                      '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
@@ -363,7 +363,7 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
             '\\documentclass[10pt, a4paper, french]{article}\n'
             '\\usepackage[total={17.2cm,25.cm}, left=1.9cm, top=2.5cm]{geometry}\n'
         )
-        title_string = 'LISTE DES PUBLICATIONS'
+        title_string = 'LISTE DE PUBLICATIONS'
 
     else:
         Name_ref_imp = 'MAJOR REFEREED PUBLICATIONS'
@@ -417,7 +417,9 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
         '\\end{Large}\\end{center}\n\n'
         '\\setcounter{section}{0}\n\n')
 
-    latex_footer = ('\\end{document}\n')
+    latex_footer = ('\n\n'
+                    '\n\n'
+                    '\\end{document}\n')
 
     # print(name_file)
     with open(name_file, 'w') as outf:
@@ -458,10 +460,10 @@ def create_latex_files(author_name, years, french=False, phd_sec = False, wp_sec
 
         if wp_sec_mazoyer:
             ref_wp = [
-                '\\item Boccaletti, A. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
-                '\\item Gaudi, B. S. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
-                '\\item The LUVOIR Team ({\\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}',
-                '\\item {\\bf  Mazoyer, J.} et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
+                '\\item[$\\bullet$] Boccaletti, A. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
+                '\\item[$\\bullet$] Gaudi, B. S. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
+                '\\item[$\\bullet$] The LUVOIR Team ({\\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}',
+                '\\item[$\\bullet$] {\\bf  Mazoyer, J.} et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
             ]
 
             outf.write(
