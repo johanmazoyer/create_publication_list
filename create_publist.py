@@ -280,8 +280,8 @@ def create_latex_subpart(author_name,
     if major and refereed:
         bool_inject_CRPhys = True
 
-    if not major and refereed:
-        latex_subpart += "\item[$\\bullet$] Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 microns}, {\\bf (submitted to AJ)} \href{https://doi.org/10.48550/arXiv.2208.14990}{arXiv:2208.14990} \n"
+    # if not major and refereed:
+    #     latex_subpart += "\item[$\\bullet$] Carter, A. L. ; Hinkley, S. ; Kammerer, J. et al. ({\\bf 2023}), {\it The JWST Early Release Science Program for Direct Observations of Exoplanetary Systems I: High Contrast Imaging of the Exoplanet HIP 65426 b from 2-16 microns}, {\\bf (submitted to AJ)} \href{https://doi.org/10.48550/arXiv.2208.14990}{arXiv:2208.14990} \n"
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
@@ -490,11 +490,11 @@ if __name__ == '__main__':
     french = False # True French, False English. Default is false (English)
     Number_authors_displayed=3
 
-    lang = '_fr' if french else '_en'
-    name_publi = 'publication_list_' + author_name.split(',')[0]+ lang
-    create_latex_files(author_name, years=years, french=french)
-    os.system('pdflatex ' + name_publi + '.tex')
-    os.system('rm *.aux && rm *.log && rm *.out')
+    # lang = '_fr' if french else '_en'
+    # name_publi = 'publication_list_' + author_name.split(',')[0]+ lang
+    # create_latex_files(author_name, years=years, french=french)
+    # os.system('pdflatex ' + name_publi + '.tex')
+    # os.system('rm *.aux && rm *.log && rm *.out')
 
     ### For me
     for french in [True, False]:
@@ -507,12 +507,11 @@ if __name__ == '__main__':
         
         create_latex_files(author_name, years=years, french=french, wp_sec_mazoyer = True, phd_sec = True)
         os.system('pdflatex ' + name_publi + '.tex')
-
-        time.sleep(5)
+        time.sleep(2)
         os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(5)
+        time.sleep(2)
         os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(5)
+        time.sleep(2)
         os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
         os.system(
             'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
@@ -521,4 +520,4 @@ if __name__ == '__main__':
     os.system(
         'cd ../mywebpage/ && git add . && git commit -m "automatically update list publications" && git push'
     )
-    os.system('rm *.aux && rm *.log && rm *.out && rm *.fls && rm *.fdb_latexmk')
+    os.system('rm *.aux|| true && rm *.log || true && rm *.out || true && rm *.fls || true && rm *.fdb_latexmk || true')
