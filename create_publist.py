@@ -12,7 +12,7 @@ def measure_h_factor(author, refereed=None, years=None, rows=1000):
     Given an array of citations (each citation is a non-negative integer)
     of a researcher, write a function to compute the researcher's h-index.
     
-        :param author: str, author name
+    :param author: str, author name
     :param refereed: boolean or `None`, if `True`, only extract refereed
                      publications; if `False`, only extract not refereed
                      publications; if `None`, extract all; default: `None`
