@@ -296,7 +296,8 @@ def create_latex_subpart(author_name,
         bool_inject_CRPhys = True
 
     if major and refereed:
-        latex_subpart += "\item Stasevic, S. ; Milli, J. ; {\\bf Mazoyer, J.} et al. ({\\bf2023}), {\it An inner warp discovered in the disk around HD 110058 using VLT/SPHERE and HST/STIS} (Under press in A\&A), \href{https://doi.org/10.48550/arXiv.2308.05613}{arXiv Link} \n"
+        latex_subpart += "\\item[$\\bullet$]  Hom, J. ;  Patience, J. ; Chen, C ; Gaspard D.,  {\\bf Mazoyer, J.}, {\\it A Uniform Analysis of Debris Disks with the Gemini Planet Imager II: An Investigation of Disk Properties with Radiative Transfer Forward Modeling}  {\\bf(submitted to MNRAS)} \n"
+        latex_subpart += "\\item Stasevic, S. ; Milli, J. ; {\\bf Mazoyer, J.} et al. ({\\bf2023}), {\it An inner warp discovered in the disk around HD 110058 using VLT/SPHERE and HST/STIS} (Under press in A\&A), \href{https://doi.org/10.48550/arXiv.2308.05613}{arXiv Link} \n"
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
