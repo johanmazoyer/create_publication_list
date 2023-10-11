@@ -295,9 +295,12 @@ def create_latex_subpart(author_name,
     if major and refereed:
         bool_inject_CRPhys = True
 
-    if major and refereed:
-        latex_subpart += "\\item[$\\bullet$]  Hom, J. ;  Patience, J. ; Chen, C ; Gaspard D.,  {\\bf Mazoyer, J.}, {\\it A Uniform Analysis of Debris Disks with the Gemini Planet Imager II: An Investigation of Disk Properties with Radiative Transfer Forward Modeling}  {\\bf(submitted to MNRAS)} \n"
-        latex_subpart += "\\item Stasevic, S. ; Milli, J. ; {\\bf Mazoyer, J.} et al. ({\\bf2023}), {\it An inner warp discovered in the disk around HD 110058 using VLT/SPHERE and HST/STIS} (Under press in A\&A), \href{https://doi.org/10.48550/arXiv.2308.05613}{arXiv Link} \n"
+    # if major and refereed:
+    #     latex_subpart += "\\item Stasevic, S. ; Milli, J. ; {\\bf Mazoyer, J.} et al. ({\\bf2023}), {\it An inner warp discovered in the disk around HD 110058 using VLT/SPHERE and HST/STIS} (Under press in A\&A), \href{https://doi.org/10.48550/arXiv.2308.05613}{arXiv Link} \n\n"
+
+    if (not major) and refereed:
+        latex_subpart += "\\item[$\\bullet$]  Crotts, K. A. ; C. Matthews B. C. ; Duchêne G. et al. {\\it A Uniform Analysis of Debris Disks with the Gemini Planet Imager I: An Empirical Search for Perturbations from Planetary Companions in Polarized Light Images}  {\\bf(submitted to AJ)} \n\n"
+        latex_subpart += "\\item[$\\bullet$]  Hom, J. ;  Patience, J. ; Chen, C. H. et al. {\\it A Uniform Analysis of Debris Disks with the Gemini Planet Imager II: An Investigation of Disk Properties with Radiative Transfer Forward Modeling}  {\\bf(submitted to MNRAS)} \n\n"
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
@@ -305,7 +308,9 @@ def create_latex_subpart(author_name,
 
     for paper in list(papers):
         ref = clean_string(
-            select_cit(reject_cit(major_or_minor(create_paper_latex_line(paper, author_name), major=major),
+            select_cit(reject_cit(major_or_minor(create_paper_latex_line(
+                paper, author_name, Number_authors_displayed=Number_authors_displayed),
+                                                 major=major),
                                   reject_kw=reject_kw),
                        select_kw=select_kw))
 
