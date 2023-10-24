@@ -44,6 +44,6 @@ add_pub_manually:
 #             - []
 
 #     white_paper:
-#         - '\item[$\bullet$] The LUVOIR Team ({\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}'
+#         - ['last', '\item[$\bullet$] The LUVOIR Team ({\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}']
 
 
