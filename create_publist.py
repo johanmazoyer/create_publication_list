@@ -9,6 +9,9 @@ import yaml
 
 
 def check_ads_token():
+    """Check if the given token exist py trying to runa query
+    """
+
     try:
         papers = list(ads.SearchQuery(q="exoplanets", sort="citation_count", rows=2))
     except:
@@ -18,19 +21,23 @@ def check_ads_token():
 
 
 def measure_h_factor(author, refereed=None, years=None, rows=1000):
-    """
-    compute the researcher's h-index.
-    
-    :param author: str, author name
-    :param refereed: boolean or `None`, if `True`, only extract refereed
+    """compute the researcher's h-index.
+
+    Parameters
+    ----------
+    author: str, author name
+    refereed: boolean or `None`, if `True`, only extract refereed
                      publications; if `False`, only extract not refereed
                      publications; if `None`, extract all; default: `None`
-    :param years: tuple, list, or `None`, range of years to query or `None`,
+    years: tuple, list, or `None`, range of years to query or `None`,
                   default: `None`
-    :param rows: int, maximum number of publications to extract
+    rows: int, maximum number of publications to extract
 
-    :return: int, h factor of the researcher
+    Returns
+    ------------
+    h_factor : int, h factor of the researcher
     """
+
     papers = query_papers(author, refereed=refereed, years=years, rows=rows)
 
     citations = []
@@ -43,15 +50,19 @@ def measure_h_factor(author, refereed=None, years=None, rows=1000):
 def query_papers(author, refereed=None, years=None, rows=1000):
     """query papers from NASA ADS
 
-    :param author: str, author name
-    :param refereed: boolean or `None`, if `True`, only extract refereed
+    Parameters
+    ----------
+    author: str, author name
+    refereed: boolean or `None`, if `True`, only extract refereed
                      publications; if `False`, only extract not refereed
                      publications; if `None`, extract all; default: `None`
-    :param years: tuple, list, or `None`, range of years to query or `None`,
+    years: tuple, list, or `None`, range of years to query or `None`,
                   default: `None`
-    :param rows: int, maximum number of publications to extract
+    rows: int, maximum number of publications to extract
 
-    :return: list of ads publication objects
+    Returns
+    ------------
+    list of ads publication objects
     """
     # set query payload
     if refereed is None:
@@ -74,78 +85,76 @@ def query_papers(author, refereed=None, years=None, rows=1000):
     return list(papers)
 
 
-def create_paper_latex_line(paper, name=None, Number_authors_displayed=3):
-    """create the latex document in strings using latex encoding
+def create_paper_latex_line(paper, researcher_name=None, Number_authors_displayed=3):
+    """From a paper, create a string line in latex format.
 
-    :param paper: ads publication object
-    :param name: string or `None`, name that will be highlighted in latex,
-                 default: `None`
-    param Number_authors_displayed: the number of authors displayed in the citation line
+    Parameters
+    ----------
+    paper: ads publication object
+    researcher_name: string or `None`, name that will be highlighted in latex,
+                    default: `None`
+    Number_authors_displayed: the number of authors displayed in the citation line
                                     also used to defined what is an "major paper" if
                                     the authors is in the first Number_authors_displayed authors
 
-    :return: str, latex encoded string for paper
+    Returns
+    ------------
+    str, latex encoded string for paper
     """
     out = ''
     # put paper title in italic font
     title = '{\\it ' + utf8tolatex(paper.title[0]) + '}'
 
     # build author list
-    if name is None:
-        # treat all author names equally and list all of them
-        authors = [utf8tolatex(paper.author[i]) for i in range(len(paper.author))]
-        etal = False
-    else:
-        # highlight `name` in output string, if provided
-        authors = []
-        # name_found = False
-        # dotdotdot = False
-        etal = False
-        comma_or_and_between_authors = 'coma'
 
-        if len(paper.author) == 2:
-            comma_or_and_between_authors = 'and'
+    authors = []
 
-        for i in range(len(paper.author)):
-            # `name` is the i-th author on this paper
-            author = utf8tolatex(paper.author[i])
-            nom = author.split(',')[0]
-            if len(author.split(',')) > 1:
-                prenoms = author.split(',')[1]
-            else:
-                prenoms = '?'
-            prenoms = prenoms.replace("-", " -")
-            prenoms = prenoms.split(' ')
-            while True:
-                try:
-                    prenoms.remove('')
-                except ValueError:
-                    break
+    etal = False
+    comma_or_and_between_authors = 'coma'
 
-            for prenomj, prenom in enumerate(prenoms):
-                if prenom[0] == '-':
-                    prenoms[prenomj] = prenom[0:2] + '.'
-                elif prenom[0] == '{':
-                    end = prenom.find('}')
-                    prenoms[prenomj] = prenom[0:end + 1] + '.'
-                else:
-                    prenoms[prenomj] = prenom[0] + '.'
+    if len(paper.author) == 2:
+        comma_or_and_between_authors = 'and'
 
-            author = nom + ", " + " ".join(prenoms)
-            #print(author)
-
-            if i < Number_authors_displayed:
-                name_short = author_name.split(', ')[0]
-                if name_short in author:
-                    authors.append('{\\bf ' + author + '}')
-                else:
-                    authors.append(author)
-
-                    #if len(prenoms.split(' ')) > 2:
-                    #    print(author.split(' ')[1])
-            else:
-                etal = True
+    for i in range(len(paper.author)):
+        # `name` is the i-th author on this paper
+        author = utf8tolatex(paper.author[i])
+        nom = author.split(',')[0]
+        if len(author.split(',')) > 1:
+            prenoms = author.split(',')[1]
+        else:
+            prenoms = '?'
+        prenoms = prenoms.replace("-", " -")
+        prenoms = prenoms.split(' ')
+        while True:
+            try:
+                prenoms.remove('')
+            except ValueError:
                 break
+
+        for prenomj, prenom in enumerate(prenoms):
+            if prenom[0] == '-':
+                prenoms[prenomj] = prenom[0:2] + '.'
+            elif prenom[0] == '{':
+                end = prenom.find('}')
+                prenoms[prenomj] = prenom[0:end + 1] + '.'
+            else:
+                prenoms[prenomj] = prenom[0] + '.'
+
+        author = nom + ", " + " ".join(prenoms)
+        #print(author)
+
+        if i < Number_authors_displayed:
+            researcher_name_short = researcher_name.split(', ')[0]
+            if researcher_name_short in author:
+                authors.append('{\\bf ' + author + '}')
+            else:
+                authors.append(author)
+
+                #if len(prenoms.split(' ')) > 2:
+                #    print(author.split(' ')[1])
+        else:
+            etal = True
+            break
 
     # join author list and add 'et al.' if required
     if etal:
@@ -167,9 +176,6 @@ def create_paper_latex_line(paper, name=None, Number_authors_displayed=3):
 
     doi_link = ''
     if paper.doi is not None:
-        # print(paper.doi[0])
-        # doi_link = ("\\url{http://doi.org/" + paper.doi[0] +"}")
-        # doi_link = ('\href{https://doi.org/' + paper.doi[0] + '}{doi.org/' + paper.doi[0] + '}')
         doi_link = ('\href{https://doi.org/' + paper.doi[0] + '}{DOI Link}')
 
     arxiv_link = ''
@@ -184,7 +190,7 @@ def create_paper_latex_line(paper, name=None, Number_authors_displayed=3):
     out = ('\\item ' + authors + ' ({\\bf' + year + '}), ' + title + ', ' + pub)
     if doi_link != '':
         out += ', ' + doi_link
-    if arxiv_link != '':
+    elif arxiv_link != '':
         out += ', ' + arxiv_link
 
     # add number of citations, if available
@@ -197,12 +203,18 @@ def create_paper_latex_line(paper, name=None, Number_authors_displayed=3):
 
 
 def reject_cit(latex_string, reject_kw=None):
-    """reject some citation substrings base on keywords
+    """Reject some paper latex paper lines based on some keywords.
+        Example: you want to avoid certain publications.
 
-    reject_kw: string list of keywords
-    param out: string containing publication information
+    Parameters
+    ----------
+    latex_string: string, one paper line in the latex
+    reject_kw: string, list of keywords. Optional, default None
+                if None,  everything is returned
 
-    return latex_string: string
+    Returns
+    ------------
+    latex_string: string, one paper line in the latex or ''
     """
 
     if reject_kw is None:  # no rejection everything goes
@@ -216,12 +228,19 @@ def reject_cit(latex_string, reject_kw=None):
 
 
 def select_cit(latex_string, select_kw=None):
-    """reject some citation substrings base on keywords
+    """Reject some paper latex paper lines unless they have certain keywords.
+        Example: you only want Thesis
 
-    reject_kw: string list of keywords
-    param out: string containing publication information
+    Parameters
+    ----------
+    latex_string: string, one paper line in the latex
+    select_kw: string, list of keywords. Optional, default None
+                if None,  everything is returned
 
-    return latex_string: string
+    Returns
+    ------------
+    latex_string: string, one paper line in the latex or ''
+
     """
 
     if select_kw is None:  # no selection everything goes
@@ -235,23 +254,35 @@ def select_cit(latex_string, select_kw=None):
 
 
 def clean_string(latex_string):
-    """fix some citation substrings which is rejected by latex
+    """Fix some citation substrings which is rejected by latex. This is a pain 
+        in the back, people put weird stuff in their paper titles, you might need to modify this
+        if you cannot compile your latex
 
-    :param out: string containing publication information
+    Parameters
+    ----------
+    latex_string: string, one paper line in the latex
 
-    :return out: string
+    Returns
+    ------------
+    cleaned_latex_string: string, one paper line in the latex 
+
     """
+
     # substrings to be replaced
     fix = {
         '─': '-',
         '#': '\#',
+        '{\\&}amp;': '\&',
+        '&amp;': '\&',
         '&': '\&',
+        '\\\\&': '\&',
         '★': 'star',
         '⨁': 'earth',
         '{\ensuremath{<}}SUB{\ensuremath{>}}': '$_{',
         '{\ensuremath{<}}SUP{\ensuremath{>}}': '$^{',
         '{\ensuremath{<}}/SUB{\ensuremath{>}}': '}$',
         '{\ensuremath{<}}/SUP{\ensuremath{>}}': '}$',
+        '\\textdegree': 'degrees',
     }
     for key, val in fix.items():
         if key in latex_string:
@@ -260,17 +291,25 @@ def clean_string(latex_string):
     return latex_string
 
 
-def major_or_minor(latex_string, major=None):
-    """sort major and minor publications based on the position of the researcher in the author list
-    
-    :param latex_string: string containing publication information
-    param major:    if None, take all
-                    if True, only take the one where the author is in the first names
-                    if True, only take the one where the author is NOT in the first names
+def major_or_minor(researcher_name, latex_string, major=None):
+    """Select major and minor publications based on if the reseracher name is in it,
+        which depend if the Number_authors_displayed chosen.
 
-    :return latex_string: string
+    Parameters
+    ----------
+    researcher_name : string, name of the reserachers for which this list is created
+    latex_string: string, one paper line in the latex
+    major: 'True', 'False' or 'None'
+            If True, only paper strings in which the resarchers name is listed are returned, 
+            If False, only paper strings in which the resarchers name is NOT listed are returned, 
+            if None, all paper strings are returned
+
+    Returns
+    ------------
+    selected_latex_string: string, one paper line in the latex 
+
     """
-    name_short = author_name.split(', ')[0]
+    name_short = researcher_name.split(', ')[0]
     if major is None:
         return latex_string
     elif major:
@@ -283,20 +322,48 @@ def major_or_minor(latex_string, major=None):
     return latex_string
 
 
-def create_latex_subpart(author_name,
+def create_latex_subpart(researcher_name,
                          years,
                          Name_part='MY PAPERS',
+                         Number_authors_displayed=3,
                          refereed=None,
                          major=None,
                          reject_kw=None,
                          select_kw=None,
                          bullet='itemize',
                          add_publi_manually=list()):
-    """create a altex string for each subparts of the list
+    """Create a Latex paragraph with a paper list based on different options
 
-    :param out: string containing publication information
+    Parameters
+    ----------
+    researcher_name : string, name of the reserachers for which this list is created
+    years: tupple, range of years in the query
+    Name_part: string, optional, default 'MY PAPERS'
+                name of the latex subpart
+    Number_authors_displayed: int, optinal, default = 3
+                number of author printed by paper. This is also the criteria used to distinguished if a paper is 'major' or 'minor'
+    refereed: 'True', 'False' or 'None'
+            If True, only refereed papers are listed in this latex subpart, 
+            If False, only non refereed papers are listed in this latex subpart, 
+            if None, all papers are listed in this latex subpart, 
+    major: 
+            If True, only major papers strings are listed in this latex subpart (if researcher_name position in the author list <= Number_authors_displayed), 
+            If False, only minor papers strings are listed in this latex subpart (if researcher_name position in the author list > Number_authors_displayed), 
+            if None, all paper strings are returned
+    reject_kw: list of string or None
+            a list of keywords that can be used to reject some papers. Example reject_kw=['arXiv e-prints']
+    select_kw: list of string or None
+            a list of keywords that can be used to select only some papers. Example select_kw=['Thesis']
+    bullet: string
+        latex list option 'enumerate' or 'itemize'
+    add_publi_manually: list
+        add publication to this list no matter what. This can be for example a publication submitted but not yet on ADS. the format must be a list
+        where each elements is a list of 2 element. The first one is 'last' (paper will be injected at the latest of the list) or 'year', paper will be injected at a specific year
+        and the second oen is the latex string of the paper. See yaml file for help
 
-    :return out: latex string of a subpart
+    Returns
+    ------------
+    latex_paragraph: string, paragraph in the latex 
     """
 
     latex_subpart = ('\\vspace{-0.9cm}\n'
@@ -306,7 +373,7 @@ def create_latex_subpart(author_name,
                      '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
     # pull references from ads
-    papers = query_papers(author_name, refereed=refereed, years=years)
+    papers = query_papers(researcher_name, refereed=refereed, years=years)
     there_at_least_one_cit = False
 
     publi_manu_years = list()
@@ -329,8 +396,11 @@ def create_latex_subpart(author_name,
 
     for paper in list(papers):
         ref = clean_string(
-            select_cit(reject_cit(major_or_minor(create_paper_latex_line(
-                paper, author_name, Number_authors_displayed=Number_authors_displayed),
+            select_cit(reject_cit(major_or_minor(researcher_name,
+                                                 create_paper_latex_line(
+                                                     paper,
+                                                     researcher_name,
+                                                     Number_authors_displayed=Number_authors_displayed),
                                                  major=major),
                                   reject_kw=reject_kw),
                        select_kw=select_kw))
@@ -355,12 +425,23 @@ def create_latex_subpart(author_name,
     return latex_subpart
 
 
-def create_latex_subpart_manually(Name_part='MY PAPERS', list_ref=None, bullet='itemize'):
-    """create a altex string for each subparts of the list
+def create_latex_subpart_manually(Name_part='MY PAPERS', bullet='itemize', list_ref=list()):
+    """Create a Latex sublist manually
 
-    :param out: string containing publication information
+    Parameters
+    ----------
+    Name_part: string, optional, default 'MY PAPERS'
+                name of the latex subpart
+    bullet: string
+        latex list option 'enumerate' or 'itemize'
+    add_publi_manually: list
+        add publication to this list no matter what. This can be for example a publication submitted but not yet on ADS. the format must be a list
+        where each elements is a list of 2 element. The first one is 'last' (paper will be injected at the latest of the list) or 'year', paper will be injected at a specific year
+        and the second oen is the latex string of the paper. See yaml file for help
 
-    :return out: latex string of a subpart
+    Returns
+    ------------
+    latex_paragraph: string, paragraph in the latex 
     """
 
     latex_subpart = ('\\vspace{-0.9cm}\n'
@@ -373,7 +454,7 @@ def create_latex_subpart_manually(Name_part='MY PAPERS', list_ref=None, bullet='
 
     for ref in list(list_ref):
         there_at_least_one_cit = True
-        latex_subpart = latex_subpart + ref + '\n\n'
+        latex_subpart = latex_subpart[1] + ref + '\n\n'
 
     if not there_at_least_one_cit:
         return ''
@@ -383,7 +464,39 @@ def create_latex_subpart_manually(Name_part='MY PAPERS', list_ref=None, bullet='
     return latex_subpart
 
 
-def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_manually=None):
+def create_latex_files(researcher_name,
+                       years,
+                       french=False,
+                       Number_authors_displayed=3,
+                       phd_sec=False,
+                       add_pub_manually=None):
+    """Create and save a full latex file. This part should be customized depending on how you want to organize your publication list.
+    I'm an instrumentalist so SPIE proceedings are important but you can customized as you see fit.
+    There are currently 6 parts:
+        - Major refereed papers (if researcher_name position in the author list <= Number_authors_displayed),
+        - Minor refereed papers (if researcher_name position in the author list > Number_authors_displayed),
+        - Major proceeding papers (if researcher_name position in the author list <= Number_authors_displayed),
+        - Minor proceeding papers (if researcher_name position in the author list > Number_authors_displayed),
+        - A subpart with only some white papers
+        - My phd 
+
+    Parameters
+    ----------
+    researcher_name : string, name of the reserachers for which this list is created
+    years: tupple, range of years in the query
+    french: Bool
+        If true, in french, else in english
+    Number_authors_displayed: int, optinal, default = 3
+                number of author printed by paper. This is also the criteria used to distinguished if a paper is 'major' or 'minor'
+    phd_sec: bool, optional False
+        Do you want a phd section (only if your phd is on ads :-) )
+    add_publi_manually: dict()
+        See yaml file for help
+
+    Returns
+    ------------
+    No return, latex file is directly savec
+    """
 
     if french:
         Name_ref_imp = 'PRINCIPAUX ARTICLES'
@@ -424,8 +537,8 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_
         'arXiv e-prints',
     ]
 
-    name_short = author_name.split(', ')[0]
-    name_file = 'publication_list_' + name_short + '_' + lang + '.tex'
+    researcher_name_short = researcher_name.split(', ')[0]
+    name_file = 'publication_list_' + researcher_name_short + '_' + lang + '.tex'
 
     latex_header = (
         geom_string + '\\usepackage{etaremune}\n'
@@ -455,8 +568,9 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_
     with open(name_file, 'w') as outf:
         outf.write(latex_header + '\n\n')
         outf.write(
-            create_latex_subpart(author_name,
+            create_latex_subpart(researcher_name,
                                  Name_part=Name_ref_imp,
+                                 Number_authors_displayed=Number_authors_displayed,
                                  refereed=True,
                                  years=years,
                                  major=True,
@@ -464,8 +578,9 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_
                                  bullet='enumerate',
                                  add_publi_manually=add_pub_manually["refereed"]['major']))
         outf.write(
-            create_latex_subpart(author_name,
+            create_latex_subpart(researcher_name,
                                  Name_part=Name_ref_nonimp,
+                                 Number_authors_displayed=Number_authors_displayed,
                                  refereed=True,
                                  years=years,
                                  major=False,
@@ -474,8 +589,9 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_
                                  add_publi_manually=add_pub_manually["refereed"]['minor']))
 
         outf.write(
-            create_latex_subpart(author_name,
+            create_latex_subpart(researcher_name,
                                  Name_part=Name_nonref_imp,
+                                 Number_authors_displayed=Number_authors_displayed,
                                  refereed=False,
                                  years=years,
                                  major=True,
@@ -483,8 +599,9 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_
                                  bullet='enumerate',
                                  add_publi_manually=add_pub_manually["proceeding"]['major']))
         outf.write(
-            create_latex_subpart(author_name,
+            create_latex_subpart(researcher_name,
                                  Name_part=Name_nonref_nonimp,
+                                 Number_authors_displayed=Number_authors_displayed,
                                  refereed=False,
                                  years=years,
                                  major=False,
@@ -502,7 +619,7 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_
 
         if phd_sec:
             outf.write(
-                create_latex_subpart(author_name,
+                create_latex_subpart(researcher_name,
                                      Name_part=Name_these,
                                      years=(2014, 2014),
                                      reject_kw=None,
@@ -521,22 +638,29 @@ if __name__ == '__main__':
     ads.config.token = config["ads_config_token"]  # your ADS token
     check_ads_token()
 
-    author_name = 'Mayor,  Michel'  # last name, first name
+    researcher_name = 'Mayor,  Michel'  # last name, first name
     years = (1900, 2040)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 3
+    # this parameter is the number of author that are going to be printed in the latex for a paper
+    # but it is also what differentieate between an "important" paper or not which will separate in different parts
 
     dict_pub_manually = config["add_pub_manually"]
 
     lang = '_fr' if french else '_en'
-    name_publi = 'publication_list_' + author_name.split(',')[0] + lang
+    name_publi = 'publication_list_' + researcher_name.split(',')[0] + lang
 
-    create_latex_files(author_name, years=years, french=french, phd_sec=True, add_pub_manually=dict_pub_manually)
+    create_latex_files(researcher_name,
+                       years=years,
+                       french=french,
+                       Number_authors_displayed=Number_authors_displayed,
+                       phd_sec=True,
+                       add_pub_manually=dict_pub_manually)
 
     os.system('pdflatex ' + name_publi + '.tex')
 
     print("")
-    print("The h-factor of " + author_name + " is:", measure_h_factor(author_name))
+    print("The h-factor of " + researcher_name + " is:", measure_h_factor(researcher_name))
     print("")
 
     os.system('rm *.aux|| true && rm *.log || true && rm *.out || true && rm *.fls || true && rm *.fdb_latexmk || true')
