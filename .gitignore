@@ -9,5 +9,6 @@
 *.log
 *.out
 *.yaml
+*.pyc
 
-johan_mazoyer_pub_list.py
+zz_johan_mazoyer_pub_list.py

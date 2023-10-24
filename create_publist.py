@@ -434,7 +434,7 @@ def create_latex_subpart_manually(Name_part='MY PAPERS', bullet='itemize', list_
                 name of the latex subpart
     bullet: string
         latex list option 'enumerate' or 'itemize'
-    add_publi_manually: list
+    list_ref: list
         add publication to this list no matter what. This can be for example a publication submitted but not yet on ADS. the format must be a list
         where each elements is a list of 2 element. The first one is 'last' (paper will be injected at the latest of the list) or 'year', paper will be injected at a specific year
         and the second oen is the latex string of the paper. See yaml file for help
@@ -454,12 +454,12 @@ def create_latex_subpart_manually(Name_part='MY PAPERS', bullet='itemize', list_
 
     for ref in list(list_ref):
         there_at_least_one_cit = True
-        latex_subpart = latex_subpart[1] + ref + '\n\n'
+        latex_subpart += ref[1] + '\n\n'
 
     if not there_at_least_one_cit:
         return ''
 
-    latex_subpart = latex_subpart + '\\end{' + bullet + '}\n\n'
+    latex_subpart += '\\end{' + bullet + '}\n\n'
     # print(latex_subpart)
     return latex_subpart
 
@@ -469,7 +469,8 @@ def create_latex_files(researcher_name,
                        french=False,
                        Number_authors_displayed=3,
                        phd_sec=False,
-                       add_pub_manually=None):
+                       add_pub_manually=None,
+                       output_dir=''):
     """Create and save a full latex file. This part should be customized depending on how you want to organize your publication list.
     I'm an instrumentalist so SPIE proceedings are important but you can customized as you see fit.
     There are currently 6 parts:
@@ -538,7 +539,7 @@ def create_latex_files(researcher_name,
     ]
 
     researcher_name_short = researcher_name.split(', ')[0]
-    name_file = 'publication_list_' + researcher_name_short + '_' + lang + '.tex'
+    name_file = os.path.join(output_dir, 'publication_list_' + researcher_name_short + '_' + lang + '.tex')
 
     latex_header = (
         geom_string + '\\usepackage{etaremune}\n'
@@ -647,6 +648,9 @@ if __name__ == '__main__':
 
     dict_pub_manually = config["add_pub_manually"]
 
+    output_dir = os.path.join(os.getcwd(), 'outputfiles')
+    os.makedirs(output_dir, exist_ok=True)
+
     lang = '_fr' if french else '_en'
     name_publi = 'publication_list_' + researcher_name.split(',')[0] + lang
 
@@ -655,12 +659,18 @@ if __name__ == '__main__':
                        french=french,
                        Number_authors_displayed=Number_authors_displayed,
                        phd_sec=True,
-                       add_pub_manually=dict_pub_manually)
+                       add_pub_manually=dict_pub_manually,
+                       output_dir=output_dir)
 
-    os.system('pdflatex ' + name_publi + '.tex')
+    os.system('pdflatex -output-directory ' + output_dir + ' ' + os.path.join(output_dir, name_publi + '.tex'))
 
     print("")
     print("The h-factor of " + researcher_name + " is:", measure_h_factor(researcher_name))
     print("")
 
-    os.system('rm *.aux|| true && rm *.log || true && rm *.out || true && rm *.fls || true && rm *.fdb_latexmk || true')
+    clean_files_extension = [".aux", ".log", ".out", ".fls", ".fdb_latexmk"]
+    output_files = os.listdir(output_dir)
+    for item in output_files:
+        for extension in clean_files_extension:
+            if item.endswith(extension):
+                os.remove(os.path.join(output_dir, item))
