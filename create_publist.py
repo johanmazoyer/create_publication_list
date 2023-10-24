@@ -2,9 +2,19 @@ import os
 import time
 from pylatexenc.latexencode import utf8tolatex
 import ads
+import yaml
 
 # based and adapted from a code from Michael Mommert:
 # https://mommermi.github.io/software/2019/01/27/generating-latex-publication-lists-from-nasa-ads.html
+
+
+def check_ads_token():
+    try:
+        papers = list(ads.SearchQuery(q="exoplanets", sort="citation_count", rows=2))
+    except:
+        raise Exception(
+            "you first need to create a ADS token, following this proceedure (it takes 10 seconds): https://ads.harvard.edu/handouts/ADS_API_handout.pdf"
+        )
 
 
 def measure_h_factor(author, refereed=None, years=None, rows=1000):
@@ -232,19 +242,26 @@ def clean_string(latex_string):
     :return out: string
     """
     # substrings to be replaced
-    fix = {'<SUB>': '', '</SUB>': '', '─': '-', '': ''}
+    fix = {
+        '─': '-',
+        '#': '\#',
+        '&': '\&',
+        '★': 'star',
+        '⨁': 'earth',
+        '{\ensuremath{<}}SUB{\ensuremath{>}}': '$_{',
+        '{\ensuremath{<}}SUP{\ensuremath{>}}': '$^{',
+        '{\ensuremath{<}}/SUB{\ensuremath{>}}': '}$',
+        '{\ensuremath{<}}/SUP{\ensuremath{>}}': '}$',
+    }
     for key, val in fix.items():
         if key in latex_string:
             latex_string = latex_string.replace(key, val)
-
-    latex_string = latex_string.replace('#', '\#')
-    latex_string = latex_string.replace('&', '\&')
 
     return latex_string
 
 
 def major_or_minor(latex_string, major=None):
-    """sort major and minor publications
+    """sort major and minor publications based on the position of the researcher in the author list
     
     :param latex_string: string containing publication information
     param major:    if None, take all
@@ -273,7 +290,8 @@ def create_latex_subpart(author_name,
                          major=None,
                          reject_kw=None,
                          select_kw=None,
-                         bullet='itemize'):
+                         bullet='itemize',
+                         add_publi_manually=list()):
     """create a altex string for each subparts of the list
 
     :param out: string containing publication information
@@ -287,24 +305,27 @@ def create_latex_subpart(author_name,
                      '\\vspace{0.4cm}\n\n'
                      '\\begin{' + bullet + '} \itemsep -1pt\n\n')
 
-    # if you want to add recently accepted / submitted papers, you can do it here
-    # for exampleyou can run without exluding 'arXiv e-prints', take the ones you are interested in the tex files
-    # add them here and then run again excluding 'arXiv e-prints'
-    # you can use \item[$\\bullet$] to avoid numbering them if they are not eccepted yet
-
-    if major and refereed:
-        bool_inject_CRPhys = True
-
-    # if major and refereed:
-    #     latex_subpart += "\\item Stasevic, S. ; Milli, J. ; {\\bf Mazoyer, J.} et al. ({\\bf2023}), {\it An inner warp discovered in the disk around HD 110058 using VLT/SPHERE and HST/STIS} (Under press in A\&A), \href{https://doi.org/10.48550/arXiv.2308.05613}{arXiv Link} \n\n"
-
-    if (not major) and refereed:
-        latex_subpart += "\\item[$\\bullet$]  Crotts, K. A. ; C. Matthews B. C. ; Duchêne G. et al. {\\it A Uniform Analysis of Debris Disks with the Gemini Planet Imager I: An Empirical Search for Perturbations from Planetary Companions in Polarized Light Images}  {\\bf(submitted to AJ)} \n\n"
-        latex_subpart += "\\item[$\\bullet$]  Hom, J. ;  Patience, J. ; Chen, C. H. et al. {\\it A Uniform Analysis of Debris Disks with the Gemini Planet Imager II: An Investigation of Disk Properties with Radiative Transfer Forward Modeling}  {\\bf(submitted to MNRAS)} \n\n"
-
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
     there_at_least_one_cit = False
+
+    publi_manu_years = list()
+    for publi_manu in add_publi_manually:
+        if publi_manu == []:
+            continue
+        if publi_manu[0] == 'last':
+            there_at_least_one_cit = True
+            latex_subpart += publi_manu[1] + '\n\n'
+        else:
+            try:
+                year = int(publi_manu[0])
+            except:
+                print(publi_manu)
+                raise Exception(("when adding a paper, add a 2 elements list: first one is the position",
+                                 "where you want to insert it (year of 'last'), second one is the latex string line "))
+            there_at_least_one_cit = True
+            bool_is_injected = True
+            publi_manu_years.append([year, publi_manu[1], bool_is_injected])
 
     for paper in list(papers):
         ref = clean_string(
@@ -317,11 +338,11 @@ def create_latex_subpart(author_name,
         if len(ref) > 0:
             there_at_least_one_cit = True
 
-            # we manually add the review written in Comptes Rendus. Physique since it appears as
-            # ArXiv in ADS and not as refereed. We only insert once as the first paper from 2023.
-            if major and refereed and int(paper.year) < 2023 and bool_inject_CRPhys:
-                latex_subpart += "\item Galicher, R. \& {\\bf Mazoyer, J.} ({\\bf 2023}), {\it Imaging exoplanets with coronagraphic instruments}, Comptes Rendus. Physique, Online first, pp. 1-45. \href{https://doi.org/10.5802/crphys.133}{DOI Link} \n\n"
-                bool_inject_CRPhys = False
+            # Mannually inject at the righ year
+            for publi_manu_year_here in publi_manu_years:
+                if int(paper.year) < publi_manu_year_here[0] and publi_manu_year_here[2]:
+                    latex_subpart += publi_manu_year_here[1] + '\n\n'
+                    publi_manu_year_here[2] = False
 
             print(paper.author[0], paper.year)
             latex_subpart = latex_subpart + ref + '\n\n'
@@ -362,16 +383,13 @@ def create_latex_subpart_manually(Name_part='MY PAPERS', list_ref=None, bullet='
     return latex_subpart
 
 
-def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_mazoyer=False):
+def create_latex_files(author_name, years, french=False, phd_sec=False, add_pub_manually=None):
 
     if french:
         Name_ref_imp = 'PRINCIPAUX ARTICLES'
         Name_nonref_imp = 'PRINCIPAUX ACTES DE CONFERENCES'
         Name_ref_nonimp = 'AUTRES ARTICLES'
         Name_nonref_nonimp = 'AUTRES ACTES DE CONFERENCES'
-
-        Name_wp_imp = 'PAPIERS BLANCS (SELECTION)'
-        # Name_wp_imp = 'Papiers blancs (selections)'
 
         Name_these = 'MANUSCRIT DE THESE'
 
@@ -386,20 +404,12 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
         Name_ref_nonimp = 'OTHER REFEREED PUBLICATIONS'
         Name_nonref_nonimp = 'OTHER CONFERENCE PROCEEDINGS'
 
-        Name_wp_imp = 'WHITE PAPERS (SELECTED)'
-
         Name_these = 'PHD THESIS'
 
         lang = 'en'
         geom_string = ('\\documentclass[10pt]{article}\n'
                        '\\usepackage[total={6.5in,9in},left=1in,top=1in,headheight=110pt]{geometry} \n')
         title_string = 'PUBLICATION LIST'
-
-    if author_name.split(',')[0] == 'Mazoyer' or author_name.split(',')[0] == 'mazoyer':
-        rfoot = '\\href{http://johanmazoyer.com}{johanmazoyer.com}'
-        wp_sec_mazoyer = True
-    else:
-        rfoot = author_name
 
     # words leading to a rejections for papers and proc parts (proposal, abstracts, conference w/o proc)
     reject_kw_papers = [
@@ -417,23 +427,25 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
     name_short = author_name.split(', ')[0]
     name_file = 'publication_list_' + name_short + '_' + lang + '.tex'
 
-    latex_header = (geom_string + '\\usepackage{etaremune}\n'
-                    '\\usepackage[usenames, dvipsnames]{xcolor}\n'
-                    '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n'
-                    '\\usepackage{fancyhdr}\n'
-                    '\\renewcommand{\\headrulewidth}{0pt}\n'
-                    '\\newcommand\\altand{\&}\n'
-                    '\\usepackage[nobottomtitles]{titlesec}\n'
-                    '\\pagestyle{fancy}\n'
-                    '\\rhead{}\n'
-                    '\\chead{}\n'
-                    '\\cfoot{}\n'
-                    '\\rfoot{' + rfoot + '}\n\n'
-                    '\\begin{document}\n\n'
-                    '\\begin{center}\\begin{Large}\n'
-                    '\\textbf{' + title_string + '}\n'
-                    '\\end{Large}\\end{center}\n\n'
-                    '\\setcounter{section}{0}\n\n')
+    latex_header = (
+        geom_string + '\\usepackage{etaremune}\n'
+        '\\usepackage[usenames, dvipsnames]{xcolor}\n'
+        '\\usepackage[colorlinks = true,urlcolor = BrickRed, breaklinks = true]{hyperref}\n'
+        '\\usepackage{fancyhdr}\n'
+        '\\renewcommand{\\headrulewidth}{0pt}\n'
+        '\\newcommand\\altand{\&}\n'
+        '\\usepackage[nobottomtitles]{titlesec}\n'
+        '\\pagestyle{fancy}\n'
+        '\\rhead{}\n'
+        '\\chead{}\n'
+        '\\cfoot{}\n'
+        '\\rfoot{}\n'
+        # '\\rfoot{' + rfoot + '}\n\n'
+        '\\begin{document}\n\n'
+        '\\begin{center}\\begin{Large}\n'
+        '\\textbf{' + title_string + '}\n'
+        '\\end{Large}\\end{center}\n\n'
+        '\\setcounter{section}{0}\n\n')
 
     latex_footer = ('\n\n'
                     '\n\n'
@@ -449,7 +461,8 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
                                  years=years,
                                  major=True,
                                  reject_kw=reject_kw_papers,
-                                 bullet='enumerate'))
+                                 bullet='enumerate',
+                                 add_publi_manually=add_pub_manually["refereed"]['major']))
         outf.write(
             create_latex_subpart(author_name,
                                  Name_part=Name_ref_nonimp,
@@ -457,7 +470,8 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
                                  years=years,
                                  major=False,
                                  reject_kw=reject_kw_papers,
-                                 bullet='enumerate'))
+                                 bullet='enumerate',
+                                 add_publi_manually=add_pub_manually["refereed"]['minor']))
 
         outf.write(
             create_latex_subpart(author_name,
@@ -466,7 +480,8 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
                                  years=years,
                                  major=True,
                                  reject_kw=reject_kw_papers,
-                                 bullet='enumerate'))
+                                 bullet='enumerate',
+                                 add_publi_manually=add_pub_manually["proceeding"]['major']))
         outf.write(
             create_latex_subpart(author_name,
                                  Name_part=Name_nonref_nonimp,
@@ -474,17 +489,16 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
                                  years=years,
                                  major=False,
                                  reject_kw=reject_kw_papers,
-                                 bullet='enumerate'))
+                                 bullet='enumerate',
+                                 add_publi_manually=add_pub_manually["proceeding"]['minor']))
 
-        if wp_sec_mazoyer:
-            ref_wp = [
-                '\\item[$\\bullet$] Boccaletti, A. et al. ({\\bf  2020}), {\it SPHERE+: Imaging young Jupiters down to the snowline}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:2003.05714}{arXiv:2003.05714}',
-                '\\item[$\\bullet$] Gaudi, B. S. et al. ({\\bf  2020}), {\it The Habitable Exoplanet Observatory (HabEx) Mission Concept Study Final Report}, arXiv e-prints,  \href{https://ui.adsabs.harvard.edu/abs/arXiv:2001.06683}{arXiv:2001.06683}',
-                '\\item[$\\bullet$] The LUVOIR Team ({\\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}',
-                '\\item[$\\bullet$] {\\bf  Mazoyer, J.} et al. ({\\bf  2019}), {\it High-Contrast Testbeds for Future Space-Based Direct Imaging Exoplanet Missions}, Bulletin of the American Astronomical Society, 51, 101, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1907.09508}{arXiv:1907.09508}'
-            ]
+        if len(add_pub_manually["white_paper"]) > 0:
+            if french:
+                Name_wp_imp = 'PAPIERS BLANCS (SELECTION)'
+            else:
+                Name_wp_imp = 'WHITE PAPERS (SELECTED)'
 
-            outf.write(create_latex_subpart_manually(Name_part=Name_wp_imp, list_ref=ref_wp))
+            outf.write(create_latex_subpart_manually(Name_part=Name_wp_imp, list_ref=add_pub_manually["white_paper"]))
 
         if phd_sec:
             outf.write(
@@ -500,45 +514,29 @@ def create_latex_files(author_name, years, french=False, phd_sec=False, wp_sec_m
 
 if __name__ == '__main__':
 
-    ads.config.token = 'x58IUp8AXJ7WzCZyj1Py9zc3liBKaIvRjIwodThV'  # your ADS token
-    author_name = 'Mazoyer,  Johan'  # last name, first name
-    years = (2011, 2040)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
+    with open(os.path.join(os.getcwd(), 'config_pub_list.yaml'), 'r') as file:
+        config = yaml.safe_load(file)
+
+    # first get a token https://ads.harvard.edu/handouts/ADS_API_handout.pdf
+    ads.config.token = config["ads_config_token"]  # your ADS token
+    check_ads_token()
+
+    author_name = 'Mayor,  Michel'  # last name, first name
+    years = (1900, 2040)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 3
 
-    # lang = '_fr' if french else '_en'
-    # name_publi = 'publication_list_' + author_name.split(',')[0]+ lang
-    # create_latex_files(author_name, years=years, french=french)
-    # os.system('pdflatex ' + name_publi + '.tex')
-    # os.system('rm *.aux && rm *.log && rm *.out')
+    dict_pub_manually = config["add_pub_manually"]
 
-    ### For me
-    for french in [True, False]:
-        lang = '_fr' if french else '_en'
+    lang = '_fr' if french else '_en'
+    name_publi = 'publication_list_' + author_name.split(',')[0] + lang
 
-        name_publi = 'publication_list_Mazoyer' + lang
-        name_cv = 'CV_Mazoyer' + lang
-        name_combi = 'CV_publi_Mazoyer' + lang
+    create_latex_files(author_name, years=years, french=french, phd_sec=True, add_pub_manually=dict_pub_manually)
 
-        create_latex_files(author_name, years=years, french=french, wp_sec_mazoyer=True, phd_sec=True)
-        os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(2)
-        os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(2)
-        os.system('pdflatex ' + name_publi + '.tex')
-        time.sleep(2)
-        os.system('cp ' + name_publi + '.pdf ../mywebpage/CV_publi_website/')
-        os.system(
-            'cd ../mywebpage/CV_publi_website/ && gs -dBATCH -dNOPAUSE -dPDFSETTINGS=/prepress -dPrinted=false -q -sDEVICE=pdfwrite -sOutputFile='
-            + name_combi + '.pdf ' + name_cv + '.pdf ' + name_publi + '.pdf')
+    os.system('pdflatex ' + name_publi + '.tex')
 
-    print("")
-    print("")
     print("")
     print("The h-factor of " + author_name + " is:", measure_h_factor(author_name))
     print("")
-    print("")
-    print("")
 
-    os.system('cd ../mywebpage/ && git add . && git commit -m "automatically update list publications" && git push')
     os.system('rm *.aux|| true && rm *.log || true && rm *.out || true && rm *.fls || true && rm *.fdb_latexmk || true')

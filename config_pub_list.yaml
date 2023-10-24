@@ -1,0 +1,49 @@
+
+# get a token https://ads.harvard.edu/handouts/ADS_API_handout.pdf
+ads_config_token: 'my_secret_token'
+
+
+add_pub_manually:
+    refereed:
+        major:
+            - []        
+        minor:
+            - []
+
+    proceeding:
+        major:
+            - []
+        minor:
+            - []
+
+    white_paper: []
+
+# when adding a paper, add a 2 elements list: first one is the position where you want to insert it (year of 'last'),
+# second one is the latex string line
+# For position :
+# if 'last', the publication will be added as the latest one of its category
+# (for example a publication just accepted but not yet appear in ADS as refereed)
+# if 'year', the publication will be added as the first one in 'year'
+# (for example a jourmal that is not referenced in ADS)
+
+# To find the good latex line, one solution is to run without exluding 'arXiv e-prints',
+# take the ones you are interested in the tex filesadd them here and then run again excluding 'arXiv e-prints'
+# you can use \item[$\bullet$] to avoid numbering them if they are not accepted yet for example
+
+# add_pub_manually:
+#     refereed:
+#         major:
+#             - ['2023', '\item Auteur, A. ; Author, B. {\it My paper} journal \href{https://google.fr}{DOI Link}']
+#         minor:
+#             - ['last', '\item Auteur, A. ; Author, B. {\it My minor paper} journal \href{https://google.fr}{DOI Link}']
+
+#     proceeding:
+#         major:
+#             - []
+#         minor:
+#             - []
+
+#     white_paper:
+#         - '\item[$\bullet$] The LUVOIR Team ({\bf  2019}), {\it The LUVOIR Mission Concept Study Final Report}, arXiv e-prints, \href{https://ui.adsabs.harvard.edu/abs/arXiv:1912.06219}{arXiv:1912.06219}'
+
+

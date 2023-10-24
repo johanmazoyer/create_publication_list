@@ -283,7 +283,7 @@ def create_paper_list(author_name,
     # if you want to add recently accepted / submitted papers, you can do it here
     # for exampleyou can run without exluding 'arXiv e-prints', take the ones you are interested in the tex files
     # add them here and then run again excluding 'arXiv e-prints'
-    # you can use \item[$\\bullet$] to avoid numbering them if they are not eccepted yet
+    # you can use \item[$\\bullet$] to avoid numbering them if they are not accepted yet
 
     # pull references from ads
     papers = query_papers(author_name, refereed=refereed, years=years)
