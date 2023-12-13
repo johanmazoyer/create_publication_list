@@ -103,7 +103,11 @@ def create_paper_latex_line(paper, researcher_name=None, Number_authors_displaye
     """
     out = ''
     # put paper title in italic font
-    title = '{\\it ' + utf8tolatex(paper.title[0]) + '}'
+
+    title_uncleaned = paper.title[0]
+    title_uncleaned.replace("★", "*")
+
+    title = '{\\it ' + utf8tolatex(title_uncleaned) + '}'
 
     # build author list
 
@@ -176,21 +180,20 @@ def create_paper_latex_line(paper, researcher_name=None, Number_authors_displaye
 
     doi_link = ''
     if paper.doi is not None:
-        doi_link = ('\href{https://doi.org/' + paper.doi[0] + '}{DOI Link}')
+        doi_link = ('\href{https://doi.org/' + paper.doi[0] + '}{DOI link}')
 
     arxiv_link = ''
+
     for ident in paper.identifier:
-        if 'ArXiv:' in ident:
+        if 'arXiv:' in ident:
             arxiv_id = ident[6:]
-            arxiv_link = ('\href{https://arxiv.org/abs/' + arxiv_id + '}{arxiv}')
-        elif len(ident) == 10 and ident[4] == '.':
-            arxiv_link = ('\href{https://arxiv.org/abs/' + ident + '}{arxiv}')
+            arxiv_link = ('\href{https://arxiv.org/abs/' + arxiv_id + '}{arXiv link}')
 
     # assemble output string as latex bullet list item
     out = ('\\item ' + authors + ' ({\\bf' + year + '}), ' + title + ', ' + pub)
     if doi_link != '':
         out += ', ' + doi_link
-    elif arxiv_link != '':
+    if arxiv_link != '':
         out += ', ' + arxiv_link
 
     # add number of citations, if available

@@ -1,6 +1,9 @@
 import ads
+import numpy as np
 from create_publist import *
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 
 def create_paper_latex_line_bis(paper, researcher_name=None, Number_authors_displayed=3):
@@ -21,7 +24,11 @@ def create_paper_latex_line_bis(paper, researcher_name=None, Number_authors_disp
     """
     out = ''
     # put paper title in italic font
-    title = '{\\it ' + utf8tolatex(paper.title[0]) + '}'
+
+    title_uncleaned = paper.title[0]
+    title_uncleaned.replace("★", "*")
+
+    title = '{\\it ' + utf8tolatex(title_uncleaned, substitute_bad_chars=True) + '}'
 
     # build author list
 
@@ -104,6 +111,12 @@ def create_paper_latex_line_bis(paper, researcher_name=None, Number_authors_disp
     elif arxiv_link != '':
         out += ', ' + arxiv_link
 
+    # add number of citations, if available
+    if paper.citation is not None and len(paper.citation) > 1:
+        out += ', ' + str(len(paper.citation)) + ' citations'
+    elif paper.citation is not None and len(paper.citation) == 1:
+        out += ', ' + str(len(paper.citation)) + ' citation'
+
     return out
 
 
@@ -136,20 +149,18 @@ def query_papers_with_abstract(author, refereed=None, years=None, rows=1000):
         fq += " year:{0}-{1}".format(years[0], years[1])
 
     # perform query
-    papers = ads.SearchQuery(author=author,
-                             fq=fq,
-                             q=q,
-                             sort='pubdate',
-                             rows=rows,
-                             fl=['title', 'author', 'year', 'volume', 'page', 'pub', 'identifier', 'citation', 'doi',"abstract"])
-    
+    papers = ads.SearchQuery(
+        author=author,
+        fq=fq,
+        q=q,
+        sort='pubdate',
+        rows=rows,
+        fl=['title', 'author', 'year', 'volume', 'page', 'pub', 'identifier', 'citation', 'doi', 'abstract', 'grant'])
+
     return list(papers)
 
 
-def create_paper_list(researcher_name,
-                         years,
-                         Number_authors_displayed=3,
-                         refereed=None):
+def create_paper_list(researcher_name, years, Number_authors_displayed=3, refereed=None):
     """Create a Latex paragraph with a paper list based on different options
 
     Parameters
@@ -194,7 +205,7 @@ def create_paper_list(researcher_name,
     for paper in papers:
 
         if paper.abstract is None:
-                continue
+            continue
 
         kw_bool = False
         for keyword_in_abstract in keywords_in_abstract:
@@ -204,8 +215,12 @@ def create_paper_list(researcher_name,
         if not kw_bool:
             continue
 
-        ref = clean_string(major_or_minor(researcher_name,create_paper_latex_line_bis(
-                paper, researcher_name, Number_authors_displayed=Number_authors_displayed),major=True))
+        ref = clean_string(
+            major_or_minor(researcher_name,
+                           create_paper_latex_line_bis(paper,
+                                                       researcher_name,
+                                                       Number_authors_displayed=Number_authors_displayed),
+                           major=True))
 
         if len(ref) > 0:
             there_at_least_one_cit = True
@@ -233,36 +248,37 @@ if __name__ == '__main__':
     ads.config.token = config["ads_config_token"]  # your ADS token
 
     check_ads_token()
-    range_years = (2019, 2023)  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
+    range_years = (2019, 2023
+                  )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
-    Number_authors_displayed = 3
-    keywords_in_abstract = ['exoplanet', "protoplanet", 'disk', 'companion', 'protoplanetary']
+    Number_authors_displayed = 5
+    keywords_in_abstract = ['exoplanet', "protoplanet", 'debris ', 'companion', 'protoplanetary']
 
     group_publication = list()
     group_year_publication = list()
 
-    list_authorscsv = pd.read_csv('/Users/jmazoyer/Desktop/Liste_names_exoplanet.csv', header=1)
+    list_authorscsv = pd.read_csv('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_names_exoplanet2.csv', header=1)
 
     author_list = list()
     for ind in list_authorscsv.index:
         author_list.append(list_authorscsv["nom"][ind].strip() + ", " + list_authorscsv["prenom"][ind].strip())
 
-
+    author_list.sort()
     # author_list = [
     #     "Mazoyer, Johan", "Boccaletti, Anthony", "Paumard, Thibaut", "Baudoz, Pierre", "Clénet, Yann",
     #     "Coudé du Foresto, Vincent", "Galicher, Raphaël", "Gendron, Éric", "Gratadour, Damien", "Huby, Elsa",
     #     "Kervella, Pierre", "Lacour, Sylvestre", "Lagrange, Anne-Marie", "Perrin, Guy", "Rousset, Gérard",
     #     "Vincent, Frédéric", "Glanc, Marie", "Montargès, Miguel"
     # ]
-    # author_list = [ "Boccaletti, Anthony" ,"Lagrange, Anne-Marie", "Baudoz, Pierre" , "Galicher, Raphaël" , "Huby, Elsa"]
+    # author_list = [ "Boccaletti, Anthony" ,"Lagrange, Anne-Marie"]
 
     for author_name in author_list:
         print(author_name)
 
-        list_auth, year_list = create_paper_list(
-            author_name,
-            range_years,
-            refereed = True)
+        list_auth, year_list = create_paper_list(author_name,
+                                                 range_years,
+                                                 Number_authors_displayed=Number_authors_displayed,
+                                                 refereed=True)
 
         group_publication.extend(list_auth)
         group_year_publication.extend(year_list)
@@ -279,7 +295,36 @@ if __name__ == '__main__':
     #     print("")
     # print(len(group_publication_order_uniq))
 
-    with open('/Users/jmazoyer/Desktop/Liste_papiers_exoplanet.txt', 'w') as f:
+    with open('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_papiers_exoplanet.txt', 'w') as f:
         for i in group_publication_order_uniq:
-            f.write(i  + '\n')
+            f.write(i + '\n')
             f.write('\n')
+
+    listannee = [2019,2020,2021,2022,2023]
+    publi_annee = []
+
+    for annee in listannee:
+        compteur = 0
+        for i in group_publication_order_uniq:
+            if f'({annee})' in i:
+                compteur+=1
+        publi_annee.append(compteur)
+    
+    total_paper = sum(publi_annee)
+    # print(publi_annee, total_paper)
+
+    # fig, ax = plt.subplots()
+    # ax.pie(publi_annee, labels = listannee,autopct=lambda x: '{:.0f}'.format(x * total_paper / 100))
+    # fig.suptitle(f'Papiers exoplanètes (2019-2023) (total = { total_paper })')
+    # fig.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/paper_per_year.pdf", bbox_inches='tight')
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(listannee,publi_annee)
+
+    # plt.hist(listannee,len(listannee), weights=publi_annee)
+    ax.set_xlabel('Année')
+    ax.set_ylabel('Nombres de publications')
+    ax.set_title(f'Publications exoplanètes (2019-2023) (total = { total_paper })')
+
+
+    plt.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/paper_per_year.pdf")
