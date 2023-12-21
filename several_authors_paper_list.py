@@ -246,7 +246,7 @@ if __name__ == '__main__':
     with open(os.path.join(os.getcwd(), 'config_pub_list_maz.yaml'), 'r') as file:
         config = yaml.safe_load(file)
     # first get a token https://ads.harvard.edu/handouts/ADS_API_handout.pdf
-    ads.config.token = config["ads_config_token"]  # your ADS token
+    ads.config.token = config["ads_config_token"]  # replace by your ADS token
 
     check_ads_token()
     range_years = (2019, 2023
