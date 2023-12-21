@@ -1,9 +1,10 @@
+import os
 import ads
-import numpy as np
-from create_publist import *
+from pylatexenc.latexencode import utf8tolatex
+from create_publist import clean_string, major_or_minor, check_ads_token
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import yaml
 
 
 def create_paper_latex_line_bis(paper, researcher_name=None, Number_authors_displayed=3):
@@ -252,7 +253,7 @@ if __name__ == '__main__':
                   )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 5
-    keywords_in_abstract = ['exoplanet', "protoplanet", 'debris ', 'companion', 'protoplanetary']
+    keywords_in_abstract = ['exoplanet', 'protoplanet', 'debris', 'companion', 'protoplanetary']
 
     group_publication = list()
     group_year_publication = list()
@@ -300,16 +301,16 @@ if __name__ == '__main__':
             f.write(i + '\n')
             f.write('\n')
 
-    listannee = [2019,2020,2021,2022,2023]
+    listannee = [2019, 2020, 2021, 2022, 2023]
     publi_annee = []
 
     for annee in listannee:
         compteur = 0
         for i in group_publication_order_uniq:
             if f'({annee})' in i:
-                compteur+=1
+                compteur += 1
         publi_annee.append(compteur)
-    
+
     total_paper = sum(publi_annee)
     # print(publi_annee, total_paper)
 
@@ -319,12 +320,11 @@ if __name__ == '__main__':
     # fig.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/paper_per_year.pdf", bbox_inches='tight')
 
     fig, ax = plt.subplots()
-    rects1 = ax.bar(listannee,publi_annee)
+    rects1 = ax.bar(listannee, publi_annee)
 
     # plt.hist(listannee,len(listannee), weights=publi_annee)
     ax.set_xlabel('Année')
     ax.set_ylabel('Nombres de publications')
     ax.set_title(f'Publications exoplanètes (2019-2023) (total = { total_paper })')
-
 
     plt.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/paper_per_year.pdf")
