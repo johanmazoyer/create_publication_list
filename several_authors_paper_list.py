@@ -273,7 +273,10 @@ if __name__ == '__main__':
                   )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 5
-    keywords_in_abstract = ['exoplanet', "transit", "rocky planets",  "Jupiters", 'protoplanet', 'protoplanets', 'debris', 'companion', 'protoplanetary', "exocomets"]
+    keywords_in_abstract = [
+        'exoplanet', "transit", "rocky planets", "jupiters", 'protoplanet', 'protoplanets', 'debris', 'companion',
+        'protoplanetary', "exocomets"
+    ]
 
     group_publication = list()
     group_year_publication = list()
@@ -282,7 +285,8 @@ if __name__ == '__main__':
 
     author_list = list()
     for ind in list_authorscsv.index:
-        author_list.append(list_authorscsv["nom"][ind].strip().lower().capitalize() + ", " + list_authorscsv["prenom"][ind].strip().lower().capitalize())
+        author_list.append(list_authorscsv["nom"][ind].strip().lower().capitalize() + ", " +
+                           list_authorscsv["prenom"][ind].strip().lower().capitalize())
 
     author_list.sort()
     author_list.remove("Yu, Louise")
@@ -340,8 +344,6 @@ if __name__ == '__main__':
     info_papers["first_auth"] = list()
 
     # french_afil_Acro_allpaper_peryear = dict()
-
-
 
     year_allpaper = list()
 
@@ -633,12 +635,10 @@ if __name__ == '__main__':
         info_papers["afil_acro"].append(french_afil_Acro_this_paper)
         info_papers["title"].append(paper.title)
         info_papers["first_auth"].append(paper.author[0])
-        
 
         # french_afil_Acro_allpaper_peryear[str(paper.year)] += french_afil_Acro_this_paper
 
         # print(toto, len(paper.aff), len(french_afil), len(french_afil_Acro_this_paper))
-
 
     # first to identify all institution papers
     keys, counts = np.unique(french_afil_Acro_allpaper, return_counts=True)
@@ -652,16 +652,15 @@ if __name__ == '__main__':
             big_lab_keys.append(keys[i])
 
     plt.bar(big_lab_keys, big_lab_counts)
-    plt.ylim(0, 100*(np.ceil(max(big_lab_counts)*1.2/100) ))
+    plt.ylim(0, 100 * (np.ceil(max(big_lab_counts) * 1.2 / 100)))
 
     plt.xticks(rotation=30, ha='right')
     plt.title(f"Publications 'exoplanètes' françaises par laboratoire (2019-2023)")
-    plt.text(-0.5, max(big_lab_counts)*1.19, "Attention, une même publication est ici comptée plusieures fois si")
-    plt.text(-0.5, max(big_lab_counts)*1.13, "elle inclue des auteurs dans différents laboratoires français.")
-    plt.text(-0.5, max(big_lab_counts)*1.07, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
+    plt.text(-0.5, max(big_lab_counts) * 1.19, "Attention, une même publication est ici comptée plusieures fois si")
+    plt.text(-0.5, max(big_lab_counts) * 1.13, "elle inclue des auteurs dans différents laboratoires français.")
+    plt.text(-0.5, max(big_lab_counts) * 1.07, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
 
     plt.ylabel('Nombre de publications')
-
 
     plt.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/publi_par_labo.pdf")
 
@@ -679,9 +678,9 @@ if __name__ == '__main__':
     french_afil_Acro_allpaper_peryear["2021"] = list()
     french_afil_Acro_allpaper_peryear["2020"] = list()
     french_afil_Acro_allpaper_peryear["2019"] = list()
-    
+
     for i, year in enumerate(info_papers["year"]):
-            french_afil_Acro_allpaper_peryear[str(year)] += info_papers['afil_acro'][i]
+        french_afil_Acro_allpaper_peryear[str(year)] += info_papers['afil_acro'][i]
 
     keys2023, counts2023 = np.unique(french_afil_Acro_allpaper_peryear['2023'], return_counts=True)
     keys2022, counts2022 = np.unique(french_afil_Acro_allpaper_peryear['2022'], return_counts=True)
