@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yaml
 import csv
+import random
 
 all_papers = list()
 
@@ -329,13 +330,16 @@ if __name__ == '__main__':
     total_apper_with_french_Afil = 0
 
     french_afil_Acro_allpaper = list()
-    french_afil_Acro_allpaper_peryear = dict()
 
-    french_afil_Acro_allpaper_peryear["2023"] = list()
-    french_afil_Acro_allpaper_peryear["2022"] = list()
-    french_afil_Acro_allpaper_peryear["2021"] = list()
-    french_afil_Acro_allpaper_peryear["2020"] = list()
-    french_afil_Acro_allpaper_peryear["2019"] = list()
+    info_papers = dict()
+    info_papers["year"] = list()
+    info_papers["afil_acro"] = list()
+    info_papers["title"] = list()
+    info_papers["first_auth"] = list()
+
+    # french_afil_Acro_allpaper_peryear = dict()
+
+
 
     year_allpaper = list()
 
@@ -623,10 +627,18 @@ if __name__ == '__main__':
             #     print(afil_i)
         french_afil_Acro_allpaper += french_afil_Acro_this_paper
 
-        french_afil_Acro_allpaper_peryear[str(paper.year)] += french_afil_Acro_this_paper
+        info_papers["year"].append(paper.year)
+        info_papers["afil_acro"].append(french_afil_Acro_this_paper)
+        info_papers["title"].append(paper.title)
+        info_papers["first_auth"].append(paper.author[0])
+        
+
+        # french_afil_Acro_allpaper_peryear[str(paper.year)] += french_afil_Acro_this_paper
 
         # print(toto, len(paper.aff), len(french_afil), len(french_afil_Acro_this_paper))
 
+
+    # first to identify all institution papers
     keys, counts = np.unique(french_afil_Acro_allpaper, return_counts=True)
     # print(french_afil_Acro_allpaper)
     big_lab_keys = []
@@ -648,6 +660,23 @@ if __name__ == '__main__':
     plt.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/publi_par_labo.pdf")
 
     ######## print in csv
+
+    # for i in range(len(info_papers["year"])):
+    #     afil_acro = info_papers["afil_acro"][i]
+    #     check_publilabo = "LESIA"
+    #     if check_publilabo in afil_acro:
+    #         print(f"{check_publilabo} {info_papers['year'][i]}: {info_papers['first_auth'][i]} , {info_papers['title'][i]}")
+
+    french_afil_Acro_allpaper_peryear = dict()
+    french_afil_Acro_allpaper_peryear["2023"] = list()
+    french_afil_Acro_allpaper_peryear["2022"] = list()
+    french_afil_Acro_allpaper_peryear["2021"] = list()
+    french_afil_Acro_allpaper_peryear["2020"] = list()
+    french_afil_Acro_allpaper_peryear["2019"] = list()
+    
+    for i, year in enumerate(info_papers["year"]):
+            french_afil_Acro_allpaper_peryear[str(year)] += info_papers['afil_acro'][i]
+
     keys2023, counts2023 = np.unique(french_afil_Acro_allpaper_peryear['2023'], return_counts=True)
     keys2022, counts2022 = np.unique(french_afil_Acro_allpaper_peryear['2022'], return_counts=True)
     keys2021, counts2021 = np.unique(french_afil_Acro_allpaper_peryear['2021'], return_counts=True)
