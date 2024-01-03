@@ -312,14 +312,15 @@ def major_or_minor(researcher_name, latex_string, major=None):
     selected_latex_string: string, one paper line in the latex 
 
     """
-    name_short = researcher_name.split(', ')[0].lower()
+    name_short = utf8tolatex(researcher_name.split(', ')[0].lower().capitalize()) + ","
+
     if major is None:
         return latex_string
     elif major:
-        if not name_short in latex_string.lower():
+        if not name_short in latex_string:
             return ''
     elif not major:
-        if name_short in latex_string.lower():
+        if name_short in latex_string:
             return ''
 
     return latex_string

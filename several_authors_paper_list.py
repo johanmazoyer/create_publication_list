@@ -273,10 +273,7 @@ if __name__ == '__main__':
                   )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 5
-    keywords_in_abstract = [
-        'exoplanet', "transit", "rocky planets", "jupiters", 'protoplanet', 'protoplanets', 'debris', 'companion',
-        'protoplanetary', "exocomets"
-    ]
+    keywords_in_abstract = ['exoplanet', 'rocky planets', 'jupiters', 'protoplanet', 'debris', 'companion', 'exocomets']
 
     group_publication = list()
     group_year_publication = list()
@@ -289,12 +286,11 @@ if __name__ == '__main__':
                            list_authorscsv["prenom"][ind].strip().lower().capitalize())
 
     author_list.sort()
-    author_list.remove("Yu, Louise")
 
     # indices_here = random.sample(range(0, 175), 20)
     # author_list = [author_list[i] for i in indices_here]
 
-    # author_list = ["Selsis, Franck", "Grouffal, Salomé"]
+    # author_list = ["Selsis, Franck", "Hébrard, Guillaume", "Grouffal, Salomé"]
 
     for author_name in author_list:
         print(author_name)
@@ -487,7 +483,7 @@ if __name__ == '__main__':
                 not_found_any_afil = False
 
             if any(laboname in afil_i for laboname in ["maison de la simulation", "house of simulation"]):
-                french_afil_Acro_this_paper.append("Maison de la Simulation")
+                french_afil_Acro_this_paper.append("MdlS")
                 not_found_any_afil = False
 
             if any(laboname in afil_i for laboname in
@@ -656,9 +652,9 @@ if __name__ == '__main__':
 
     plt.xticks(rotation=30, ha='right')
     plt.title(f"Publications 'exoplanètes' françaises par laboratoire (2019-2023)")
-    plt.text(-0.5, max(big_lab_counts) * 1.19, "Attention, une même publication est ici comptée plusieures fois si")
-    plt.text(-0.5, max(big_lab_counts) * 1.13, "elle inclue des auteurs dans différents laboratoires français.")
-    plt.text(-0.5, max(big_lab_counts) * 1.07, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
+    plt.text(-0.5, max(big_lab_counts) * 1.18, "Attention, une même publication est ici comptée plusieurs fois si")
+    plt.text(-0.5, max(big_lab_counts) * 1.12, "elle inclue des auteurs dans différents laboratoires français.")
+    plt.text(-0.5, max(big_lab_counts) * 1.06, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
 
     plt.ylabel('Nombre de publications')
 
@@ -742,6 +738,6 @@ if __name__ == '__main__':
     # plt.hist(listannee,len(listannee), weights=publi_annee)
     ax.set_xlabel('Année')
     ax.set_ylabel('Nombres de publications')
-    ax.set_title(f'Publications exoplanètes françaises (2019-2023) (total = { total_apper_with_french_Afil })')
+    ax.set_title(f"Publications 'exoplanètes' françaises (total = { total_apper_with_french_Afil })")
 
     plt.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/paper_per_year.pdf")
