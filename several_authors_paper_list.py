@@ -213,14 +213,23 @@ def create_paper_list(researcher_name, years, Number_authors_displayed=3, refere
 
     for paper in papers:
 
-        if paper.abstract is None:
-            print("no abstract")
-            continue
+        # print(paper.author[0], paper.title)
 
         kw_bool = False
         for keyword_in_abstract in keywords_in_abstract:
+            if keyword_in_abstract in paper.title[0].lower():
+                kw_bool = True
+
+        if paper.abstract is None:
+            # print("no abstract")
+            continue
+
+        for keyword_in_abstract in keywords_in_abstract:
             if keyword_in_abstract in paper.abstract.lower():
                 kw_bool = True
+
+        # print(kw_bool)
+        # print("")
 
         if not kw_bool:
             continue
@@ -264,7 +273,7 @@ if __name__ == '__main__':
                   )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 5
-    keywords_in_abstract = ['exoplanet', 'protoplanet', 'debris', 'companion', 'protoplanetary']
+    keywords_in_abstract = ['exoplanet', "transit", "rocky planets",  "Jupiters", 'protoplanet', 'protoplanets', 'debris', 'companion', 'protoplanetary', "exocomets"]
 
     group_publication = list()
     group_year_publication = list()
@@ -273,7 +282,7 @@ if __name__ == '__main__':
 
     author_list = list()
     for ind in list_authorscsv.index:
-        author_list.append(list_authorscsv["nom"][ind].strip() + ", " + list_authorscsv["prenom"][ind].strip())
+        author_list.append(list_authorscsv["nom"][ind].strip().lower().capitalize() + ", " + list_authorscsv["prenom"][ind].strip().lower().capitalize())
 
     author_list.sort()
     author_list.remove("Yu, Louise")
@@ -281,13 +290,7 @@ if __name__ == '__main__':
     # indices_here = random.sample(range(0, 175), 20)
     # author_list = [author_list[i] for i in indices_here]
 
-    # author_list = [
-    #     "Mazoyer, Johan", "Boccaletti, Anthony", "Paumard, Thibaut", "Baudoz, Pierre", "Clénet, Yann",
-    #     "Coudé du Foresto, Vincent", "Galicher, Raphaël", "Gendron, Éric", "Gratadour, Damien", "Huby, Elsa",
-    #     "Kervella, ", "Lacour, Sylvestre", "Lagrange, Anne-Marie", "Perrin, Guy", "Rousset, Gérard",
-    #     "Vincent, Frédéric", "Glanc, Marie", "Montargès, Miguel"
-    # ]
-    # author_list = ["Boccaletti, Anthony", "Lagrange, Anne-Marie", "Laskar, Jacques", "Meunier, Nadege"]
+    # author_list = ["Selsis, Franck", "Grouffal, Salomé"]
 
     for author_name in author_list:
         print(author_name)
@@ -320,7 +323,6 @@ if __name__ == '__main__':
     ############################################
     ## Extract affiliation
     ###########################################
-    # list all_papers contains
     paper_uniq = []
     for paperi in all_papers:
         if paperi not in paper_uniq:
