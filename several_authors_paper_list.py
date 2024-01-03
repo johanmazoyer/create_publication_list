@@ -650,12 +650,16 @@ if __name__ == '__main__':
             big_lab_keys.append(keys[i])
 
     plt.bar(big_lab_keys, big_lab_counts)
-    plt.xticks(rotation=30, ha='right')
-    plt.title(f'Publications exoplanètes françaises (2019 - 2023) : {total_apper_with_french_Afil}')
+    plt.ylim(0, 100*(np.ceil(max(big_lab_counts)*1.2/100) ))
 
-    plt.ylabel('Nombres de publications (2019 - 2023)')
-    # ax.set_xlabel('Laboratoire')
-    # ax.set_ylabel('Publication')
+    plt.xticks(rotation=30, ha='right')
+    plt.title(f"Publications 'exoplanètes' françaises par laboratoire (2019-2023)")
+    plt.text(-0.5, max(big_lab_counts)*1.19, "Attention, une même publication est ici comptée plusieures fois si")
+    plt.text(-0.5, max(big_lab_counts)*1.13, "elle inclue des auteurs dans différents laboratoires français.")
+    plt.text(-0.5, max(big_lab_counts)*1.07, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
+
+    plt.ylabel('Nombre de publications')
+
 
     plt.savefig("/Users/jmazoyer/Desktop/papers_exoplanets/publi_par_labo.pdf")
 
