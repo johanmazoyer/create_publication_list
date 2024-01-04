@@ -273,12 +273,12 @@ if __name__ == '__main__':
                   )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 5
-    keywords_in_abstract = ['exoplanet', 'rocky planets', 'jupiters', 'protoplanet', 'debris', 'companion', 'exocomets']
+    keywords_in_abstract = ['exoplanet', 'rocky planets', 'jupiters', 'protoplanet', 'debris', 'companion', 'exocomet']
 
     group_publication = list()
     group_year_publication = list()
 
-    list_authorscsv = pd.read_csv('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_names_exoplanet2.csv', header=1)
+    list_authorscsv = pd.read_csv('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_names_exoplanet3.csv', header=1)
 
     author_list = list()
     for ind in list_authorscsv.index:
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     # indices_here = random.sample(range(0, 175), 20)
     # author_list = [author_list[i] for i in indices_here]
 
-    # author_list = ["Selsis, Franck", "Hébrard, Guillaume", "Grouffal, Salomé"]
+    # author_list = ["Fouqué, Pascal"]
 
     for author_name in author_list:
         print(author_name)
