@@ -3,7 +3,7 @@ import numpy as np
 import ads
 from pylatexenc.latexencode import utf8tolatex
 from unidecode import unidecode
-from create_publist import clean_string, major_or_minor, check_ads_token
+from create_publist import clean_string, check_ads_token, is_name_in_first_authors
 import pandas as pd
 import matplotlib.pyplot as plt
 import yaml
@@ -236,12 +236,11 @@ def create_paper_list(researcher_name, years, Number_authors_displayed=3, refere
 
         all_papers.append(paper)
 
+        if not is_name_in_first_authors(researcher_name, paper.author, Number_authors_displayed):
+            continue
+
         ref = clean_string(
-            major_or_minor(researcher_name,
-                           create_paper_latex_line_bis(paper,
-                                                       researcher_name,
-                                                       Number_authors_displayed=Number_authors_displayed),
-                           major=True))
+            create_paper_latex_line_bis(paper, researcher_name, Number_authors_displayed=Number_authors_displayed))
 
         if len(ref) > 0:
             there_at_least_one_cit = True
@@ -290,7 +289,9 @@ if __name__ == '__main__':
     # indices_here = random.sample(range(0, 175), 20)
     # author_list = [author_list[i] for i in indices_here]
 
+    # author_list = ["Grießmeier, Jean-Mathias", "Fouqué, Pascal","mazoyer, johan"]
     # author_list = ["Fouqué, Pascal"]
+    # author_list = ["mazoyer, johan"]
 
     for author_name in author_list:
         print(author_name)
@@ -638,23 +639,36 @@ if __name__ == '__main__':
 
     # first to identify all institution papers
     keys, counts = np.unique(french_afil_Acro_allpaper, return_counts=True)
+    
     # print(french_afil_Acro_allpaper)
     big_lab_keys = []
     big_lab_counts = []
-    for i in range(len(keys)):
-        print(keys[i], counts[i])
-        if counts[i] > 25 and keys[i] != "Irrelevant":
-            big_lab_counts.append(counts[i])
-            big_lab_keys.append(keys[i])
 
-    plt.bar(big_lab_keys, big_lab_counts)
+    #sort by citation to identify biggest lab
+    sorted_keys = [y for _,y in sorted(zip(counts,keys))]
+    sorted_counts = [x for x,_ in sorted(zip(counts,keys))]
+
+    N_biggest_lab = 12
+    big_lab_keys = sorted_keys[-N_biggest_lab:]
+    big_lab_counts = sorted_counts[-N_biggest_lab:]
+
+    if 'Irrelevant' in big_lab_keys:
+        index_irr = big_lab_keys.index('Irrelevant')
+        big_lab_keys.pop(index_irr)
+        big_lab_counts.pop(index_irr)
+
+    #sort by citation to alphabetical order
+    sorted_big_keys = [x for x,_ in sorted(zip(big_lab_keys,big_lab_counts))]
+    sorted_big_counts = [y for _,y in sorted(zip(big_lab_keys,big_lab_counts))]
+
+    plt.bar(sorted_big_keys, sorted_big_counts)
     plt.ylim(0, 100 * (np.ceil(max(big_lab_counts) * 1.2 / 100)))
 
     plt.xticks(rotation=30, ha='right')
     plt.title(f"Publications 'exoplanètes' françaises par laboratoire (2019-2023)")
-    plt.text(-0.5, max(big_lab_counts) * 1.18, "Attention, une même publication est ici comptée plusieurs fois si")
-    plt.text(-0.5, max(big_lab_counts) * 1.12, "elle inclue des auteurs dans différents laboratoires français.")
-    plt.text(-0.5, max(big_lab_counts) * 1.06, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
+    plt.text(-0.5, max(sorted_big_counts) * 1.18, "Attention, une même publication est ici comptée plusieurs fois si")
+    plt.text(-0.5, max(sorted_big_counts) * 1.12, "elle inclue des auteurs dans différents laboratoires français.")
+    plt.text(-0.5, max(sorted_big_counts) * 1.06, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
 
     plt.ylabel('Nombre de publications')
 

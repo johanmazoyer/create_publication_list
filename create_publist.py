@@ -3,6 +3,7 @@ import time
 from pylatexenc.latexencode import utf8tolatex
 import ads
 import yaml
+import unicodedata, string
 
 # based and adapted from a code from Michael Mommert:
 # https://mommermi.github.io/software/2019/01/27/generating-latex-publication-lists-from-nasa-ads.html
@@ -294,36 +295,44 @@ def clean_string(latex_string):
     return latex_string
 
 
-def major_or_minor(researcher_name, latex_string, major=None):
-    """Select major and minor publications based on if the reseracher name is in it,
-        which depend if the Number_authors_displayed chosen.
+def remove_accents(data):
+    return ''.join(x for x in unicodedata.normalize('NFKD', data) if x in string.ascii_letters).lower()
+
+
+def is_name_in_first_authors(researcher_name, author_list, max_author_position=None):
+    """Determine if the reseracher name is in the first max_author_position 
+        author of the author_list, ignoring accent and case.
 
     Parameters
     ----------
-    researcher_name : string, name of the reserachers for which this list is created
-    latex_string: string, one paper line in the latex
-    major: 'True', 'False' or 'None'
-            If True, only paper strings in which the resarchers name is listed are returned, 
-            If False, only paper strings in which the resarchers name is NOT listed are returned, 
-            if None, all paper strings are returned
+    researcher_name : string, 
+        name of the reserachers for which this list is created
+    author_list: list of string string, 
+        authors the papers given by ADS
+    max_author_position: int
+        Maximum position of the researcher in the authors list
+            by default None: all the author list is screened for researchers
 
     Returns
     ------------
-    selected_latex_string: string, one paper line in the latex 
-
+    researcher_is_in_list: bool, true of the author is in the first max_author_position authors
     """
-    name_short = utf8tolatex(researcher_name.split(', ')[0].lower().capitalize()) + ","
 
-    if major is None:
-        return latex_string
-    elif major:
-        if not name_short in latex_string:
-            return ''
-    elif not major:
-        if name_short in latex_string:
-            return ''
+    researcher_is_in_list = False
 
-    return latex_string
+    last_name_researcher = remove_accents(researcher_name.split(', ')[0]).capitalize()
+
+    if max_author_position is None:
+        max_author_position = len(author_list)
+    if max_author_position > (len(author_list)):
+        max_author_position = len(author_list)
+
+    for i in range(max_author_position):
+        last_name_author_i = remove_accents(author_list[i].split(', ')[0]).capitalize()
+        if last_name_researcher == last_name_author_i:
+            researcher_is_in_list = True
+
+    return researcher_is_in_list
 
 
 def create_latex_subpart(researcher_name,
@@ -399,15 +408,32 @@ def create_latex_subpart(researcher_name,
             publi_manu_years.append([year, publi_manu[1], bool_is_injected])
 
     for paper in list(papers):
-        ref = clean_string(
-            select_cit(reject_cit(major_or_minor(researcher_name,
-                                                 create_paper_latex_line(
-                                                     paper,
-                                                     researcher_name,
-                                                     Number_authors_displayed=Number_authors_displayed),
-                                                 major=major),
+
+        this_is_major_paper = is_name_in_first_authors(researcher_name,
+                                                       paper.author,
+                                                       max_author_position=Number_authors_displayed)
+
+        ref_propre = clean_string(
+            select_cit(reject_cit(create_paper_latex_line(paper,
+                                                          researcher_name,
+                                                          Number_authors_displayed=Number_authors_displayed),
                                   reject_kw=reject_kw),
                        select_kw=select_kw))
+
+        if major is None:
+            # in this case, all refs are selected
+            ref = ref_propre
+
+        elif major and this_is_major_paper:
+            # in this case, we select major and this is a major publi
+            ref = ref_propre
+
+        elif not major and not this_is_major_paper:
+            # in this case, we select minor and this is a minor publi
+            ref = ref_propre
+
+        else:
+            ref = ""
 
         if len(ref) > 0:
             there_at_least_one_cit = True
