@@ -648,14 +648,19 @@ if __name__ == '__main__':
     sorted_keys = [y for _,y in sorted(zip(counts,keys))]
     sorted_counts = [x for x,_ in sorted(zip(counts,keys))]
 
-    N_biggest_lab = 12
+    if 'Irrelevant' in sorted_keys:
+        index_irr = sorted_keys.index('Irrelevant')
+        sorted_keys.pop(index_irr)
+        sorted_counts.pop(index_irr)
+
+    N_biggest_lab = 12 # we plot only the N bigest labs
+
+    if len(sorted_keys) < N_biggest_lab:
+        N_biggest_lab = len(sorted_keys)
+
     big_lab_keys = sorted_keys[-N_biggest_lab:]
     big_lab_counts = sorted_counts[-N_biggest_lab:]
 
-    if 'Irrelevant' in big_lab_keys:
-        index_irr = big_lab_keys.index('Irrelevant')
-        big_lab_keys.pop(index_irr)
-        big_lab_counts.pop(index_irr)
 
     #sort by citation to alphabetical order
     sorted_big_keys = [x for x,_ in sorted(zip(big_lab_keys,big_lab_counts))]
@@ -735,7 +740,10 @@ if __name__ == '__main__':
         else:
             counthere2019 = 0
         writer.writerow([key, counthere2019, counthere2020, counthere2021, counthere2022, counthere2023])
-
+        
+        # line to produce a latex array
+        # print('\hline')        
+        # print(key, ' & ', counthere2019, ' & ', counthere2020, ' & ',counthere2021, ' & ',counthere2022, ' & ',counthere2023, ' \\\\ ')
     # close the file
     f.close()
 
