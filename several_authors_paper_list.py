@@ -7,20 +7,393 @@ from create_publist import clean_string, check_ads_token, is_name_in_first_autho
 import pandas as pd
 import matplotlib.pyplot as plt
 import yaml
+import six
 import csv
 import random
+import pickle
 
 all_papers = list()
 
 
-def create_paper_latex_line_bis(paper, researcher_name=None, Number_authors_displayed=3):
+def add_manually_publication(paper_list):
+    ## Ajout manuel academie
+
+    authors = ['Crida, A.']
+    doi = '10.5802/crphys.161'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Observatoire de la Côte d'Azur, France"],
+        'year': "2023",
+        'title': ['Planetary formation and early phases'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-16'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Mazevet, S.', 'Affholder, A.', 'Sauterey, B.', 'Bixel, A.', ' Apai D.', 'Ferriere, R']
+    doi = '10.5802/crphys.154'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "Observatoire de la Côte d’Azur, Université Côte d’Azur, CNRS, 96 boulevard de l’observatoire, F06304 Nice cedex 4, France",
+            "Institut de Biologie de l’École Normale Supérieure, ENS, Université Paris Sciences et Lettres, Paris, France"
+            "Department of Astronomy, The University of Arizona, Tucson, AZ 85721, USA",
+            "Lunar and Planetary Laboratory, The University of Arizona, Tucson, AZ 85721, USA",
+            "Department of Ecology and Evolutionary Biology, University of Arizona, Tucson, USA",
+            "International Research Laboratory for Interdisciplinary Global Environmental Studies (iGLOBES), CNRS, ENS, Université Paris Sciences et Lettres"
+        ],
+        'year': "2023",
+        'title': ['Prospects for the characterization of habitable planets'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-16'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': doi
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Rouan, D.', 'Lagrange, A.-M.']
+    doi = '10.5802/crphys.135'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France",
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France"
+        ],
+        'year': "2023",
+        'title': ['Detection of exoplanets: exploiting each property of light'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-15'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Beaulieu, J.-P.']
+    doi = '10.5802/crphys.151'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "Institut d’Astrophysique de Paris, Sorbonne Universite, CNRS UMR 7095, 98bis Boulevard Arago, 75015 Paris, France"
+        ],
+        'year': "2023",
+        'title': ['Hunting for Cold Exoplanets via Microlensing'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-12'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Chauvin, G.']
+    doi = '10.5802/crphys.139'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Observatoire de la Côte d'Azur, France"],
+        'year': "2023",
+        'title': ['Direct imaging of exoplanets: Legacy and prospects'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-22'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Lecavelier des Etangs, A.']
+    doi = '10.5802/crphys.142'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "Institut d’Astrophysique de Paris, Sorbonne Universite, CNRS UMR 7095, 98bis Boulevard Arago, 75015 Paris, France"
+        ],
+        'year': "2023",
+        'title': ['Evaporation, from exoplanets to exocomets'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-12'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Sozzetti, A.']
+    doi = '10.5802/crphys.152'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Via Osservatorio 20, I-10025 Pino Torinese, Italy"],
+        'year': "2023",
+        'title': ['Gaia astrometry and exoplanetary science: DR2, (E)DR3, and beyond'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-12'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Mayor, M.']
+    doi = '10.5802/crphys.153'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Astronomy Department, University of Geneva, Ch.Pegasi 51, CH-1270 Versoix, Switzerland"],
+        'year': "2023",
+        'title': ['Doppler cross-correlation spectroscopy as a path to the detection of Earth-like planets'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-10'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Lacour, S.']
+    doi = '10.5802/crphys.144'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France"
+        ],
+        'year': "2023",
+        'title': ['Astrometry of directly imaged exoplanets with optical interferometry'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-14'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Charnay, B.', 'Drossart, P.']
+    doi = '10.5802/crphys.143'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France",
+            "Institut d’Astrophysique de Paris, Sorbonne Universite, CNRS UMR 7095, 98bis Boulevard Arago, 75015 Paris, France"
+        ],
+        'year': "2023",
+        'title': ['Characterization and modelling of exoplanetary atmospheres'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-11'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Strugarek, A.']
+    doi = '10.5802/crphys.138'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Université Paris-Saclay, Université Paris Cité, CEA, CNRS, AIM, 91191, Gif-sur-Yvette, France"],
+        'year': "2023",
+        'title': ['Interactions of exoplanets with their environment'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-22'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Meunier, N.']
+    doi = '10.5802/crphys.140'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Univ. Grenoble Alpes, CNRS, IPAG, F-38000 Grenoble, France"],
+        'year': "2023",
+        'title': ['Impact of stellar variability on exoplanet detectability and characterisation'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-15'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Moutou, A.', 'Donati, J.-F.', 'Debras, F.']
+    doi = '10.5802/crphys.141'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': ["Exoplanet science with SPIRou: near-infrared precision velocimetry and spectropolarimetry"],
+        'year': "2023",
+        'title': [
+            'IRAP/CNRS/OMP/UPS, 14 avenue Edouard Belin, 31400 Toulouse, France',
+            'IRAP/CNRS/OMP/UPS, 14 avenue Edouard Belin, 31400 Toulouse, France',
+            'IRAP/CNRS/OMP/UPS, 14 avenue Edouard Belin, 31400 Toulouse, France'
+        ],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-8'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Boccaletti, A.']
+    doi = '10.5802/crphys.134'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France"
+        ],
+        'year': "2023",
+        'title': ['Observations of circumstellar disks in scattered light with SPHERE at the VLT'],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-19'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    authors = ['Galicher, R.', 'Mazoyer, J.']
+    doi = '10.5802/crphys.133'
+    dico_publi_acad = {
+        'author': authors,
+        'first_author': authors[0],
+        'aff': [
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France",
+            "LESIA, Observatoire de Paris, Université PSL, CNRS, Sorbonne Université, Université Paris-Cité, 5 place Jules Janssen, 92195 Meudon, France"
+        ],
+        'year': "2023",
+        'title': ['Imaging exoplanets with coronagraphic instruments '],
+        'pub': 'Comptes Rendus. Physique',
+        'volume': 'Online first',
+        'page': ['pp. 1-45'],
+        'doi': [doi],
+        'citation': None,
+        'identifier': [doi],
+        'bibcode': f"{np.random.random(1)*1000000}"
+    }
+    publi_acad = ads.search.Article()
+    publi_acad._raw = dico_publi_acad
+    for key, value in six.iteritems(dico_publi_acad):
+        setattr(publi_acad, key, value)
+    paper_list.append(publi_acad)
+
+    return paper_list
+
+
+def remove_doublons_paper_list(paper_list):
+    ret_list = []
+    for paperi in paper_list:
+        if paperi not in ret_list:
+            ret_list.append(paperi)
+    return ret_list
+
+
+def create_paper_latex_line_bis(paper, Number_authors_displayed=3):
     """From a paper, create a string line in latex format.
 
     Parameters
     ----------
     paper: ads publication object
-    researcher_name: string or `None`, name that will be highlighted in latex,
-                    default: `None`
+`
     Number_authors_displayed: the number of authors displayed in the citation line
                                     also used to defined what is an "major paper" if
                                     the authors is in the first Number_authors_displayed authors
@@ -127,7 +500,7 @@ def create_paper_latex_line_bis(paper, researcher_name=None, Number_authors_disp
     return out
 
 
-def query_papers_with_abstract(author, refereed=None, years=None, rows=1000):
+def query_papers_with_abstract(author, refereed=None, years=None, rows=1000, dico_keyz='title'):
     """query papers from NASA ADS
 
     Parameters
@@ -156,109 +529,98 @@ def query_papers_with_abstract(author, refereed=None, years=None, rows=1000):
         fq += " year:{0}-{1}".format(years[0], years[1])
 
     # perform query
-    papers = ads.SearchQuery(author=author,
-                             fq=fq,
-                             q=q,
-                             sort='pubdate',
-                             rows=rows,
-                             fl=[
-                                 'title', 'author', 'year', 'volume', 'page', 'pub', 'identifier', 'citation', 'doi',
-                                 'abstract', 'grant', 'aff', "bibcode"
-                             ])
+    papers = ads.SearchQuery(author=author, fq=fq, q=q, sort='pubdate', rows=rows, fl=dico_keyz)
 
     return list(papers)
 
 
-def create_paper_list(researcher_name, years, Number_authors_displayed=3, refereed=None):
-    """Create a Latex paragraph with a paper list based on different options
+# def create_paper_list(researcher_name,
+#                       years,
+#                       Number_authors_displayed=3,
+#                       keywords_in_abstract=[' '],
+#                       refereed=None,
+#                       specific_bibcode=None):
+#     """Create a Latex paragraph with a paper list based on different options
 
-    Parameters
-    ----------
-    researcher_name : string, name of the reserachers for which this list is created
-    years: tupple, range of years in the query
-    Name_part: string, optional, default 'MY PAPERS'
-                name of the latex subpart
-    Number_authors_displayed: int, optinal, default = 3
-                number of author printed by paper. This is also the criteria used to distinguished if a paper is 'major' or 'minor'
-    refereed: 'True', 'False' or 'None'
-            If True, only refereed papers are listed in this latex subpart, 
-            If False, only non refereed papers are listed in this latex subpart, 
-            if None, all papers are listed in this latex subpart, 
-    major: 
-            If True, only major papers strings are listed in this latex subpart (if researcher_name position in the author list <= Number_authors_displayed), 
-            If False, only minor papers strings are listed in this latex subpart (if researcher_name position in the author list > Number_authors_displayed), 
-            if None, all paper strings are returned
-    reject_kw: list of string or None
-            a list of keywords that can be used to reject some papers. Example reject_kw=['arXiv e-prints']
-    select_kw: list of string or None
-            a list of keywords that can be used to select only some papers. Example select_kw=['Thesis']
-    bullet: string
-        latex list option 'enumerate' or 'itemize'
-    add_publi_manually: list
-        add publication to this list no matter what. This can be for example a publication submitted but not yet on ADS. the format must be a list
-        where each elements is a list of 2 element. The first one is 'last' (paper will be injected at the latest of the list) or 'year', paper will be injected at a specific year
-        and the second oen is the latex string of the paper. See yaml file for help
+#     Parameters
+#     ----------
+#     researcher_name : string, name of the reserachers for which this list is created
+#     years: tupple, range of years in the query
+#     Name_part: string, optional, default 'MY PAPERS'
+#                 name of the latex subpart
+#     Number_authors_displayed: int, optinal, default = 3
+#                 number of author printed by paper. This is also the criteria used to distinguished if a paper is 'major' or 'minor'
+#     refereed: 'True', 'False' or 'None'
+#             If True, only refereed papers are listed in this latex subpart,
+#             If False, only non refereed papers are listed in this latex subpart,
+#             if None, all papers are listed in this latex subpart,
+#     specific_bibcode: string
 
-    Returns
-    ------------
-    latex_paragraph: string, paragraph in the latex 
-    """
+#     Returns
+#     ------------
+#     latex_paragraph: string, paragraph in the latex
+#     """
 
-    paper_str_list = list()
-    year_list = list()
+#     paper_str_list = list()
+#     year_list = list()
+#     cit_list = list()
+#     bib_list = list()
 
-    # pull references from ads
-    papers = query_papers_with_abstract(researcher_name, refereed=refereed, years=years)
-    there_at_least_one_cit = False
+#     # pull references from ads
+#     papers = query_papers_with_abstract(researcher_name, refereed=refereed, years=years)
+#     there_at_least_one_cit = False
 
-    for paper in papers:
+#     for paper in papers:
 
-        # print(paper.author[0], paper.title)
+#         # print(paper.author[0], paper.title)
 
-        kw_bool = False
-        for keyword_in_abstract in keywords_in_abstract:
-            if keyword_in_abstract in paper.title[0].lower():
-                kw_bool = True
+#         kw_bool = False
+#         for keyword_in_abstract in keywords_in_abstract:
+#             if keyword_in_abstract in paper.title[0].lower():
+#                 kw_bool = True
 
-        if paper.abstract is None:
-            # print("no abstract")
-            continue
+#         if paper.abstract is None:
+#             # print("no abstract")
+#             continue
 
-        for keyword_in_abstract in keywords_in_abstract:
-            if keyword_in_abstract in paper.abstract.lower():
-                kw_bool = True
+#         for keyword_in_abstract in keywords_in_abstract:
+#             if keyword_in_abstract in paper.abstract.lower():
+#                 kw_bool = True
 
-        # print(kw_bool)
-        # print("")
+#         # print(kw_bool)
+#         # print("")
 
-        if not kw_bool:
-            continue
+#         if not kw_bool:
+#             continue
 
-        all_papers.append(paper)
+#         all_papers.append(paper)
 
-        if not is_name_in_first_authors(researcher_name, paper.author, Number_authors_displayed):
-            continue
+#         if not is_name_in_first_authors(researcher_name, paper.author, Number_authors_displayed):
+#             continue
 
-        ref = clean_string(
-            create_paper_latex_line_bis(paper, researcher_name, Number_authors_displayed=Number_authors_displayed))
+#         ref = clean_string(create_paper_latex_line_bis(paper, Number_authors_displayed=Number_authors_displayed))
 
-        if len(ref) > 0:
-            there_at_least_one_cit = True
+#         if len(ref) > 0:
+#             there_at_least_one_cit = True
 
-            # print(paper.author[0], paper.year)
-            year_here = paper.year
-            paper_str_list.append(ref)
-            year_list.append(year_here)
+#             # print(paper.author[0], paper.year)
+#             year_here = paper.year
+#             paper_str_list.append(ref)
+#             year_list.append(year_here)
+#             if paper.citation is not None:
+#                 cit_list.append(len(paper.citation))
+#             else:
+#                 cit_list.append(0)
+#             bib_list.append(paper.bibcode)
 
-            # latex_subpart = latex_subpart + ref + '\n\n'
+#             # latex_subpart = latex_subpart + ref + '\n\n'
 
-    if not there_at_least_one_cit:
-        return list(), list()
+#     if not there_at_least_one_cit:
+#         return list(), list(), list(), list()
 
-    # latex_subpart = latex_subpart + '\\end{' + bullet + '}\n\n'
-    # print(paper_str_list)
-    return paper_str_list, year_list
-
+#     # latex_subpart = latex_subpart + '\\end{' + bullet + '}\n\n'
+#     # print(paper_str_list)
+#     return paper_str_list, year_list, cit_list, bib_list
 
 if __name__ == '__main__':
 
@@ -272,12 +634,13 @@ if __name__ == '__main__':
                   )  # years to be queried: (start year, end year). If None, all years (careful with old homonyms)
     french = False  # True French, False English. Default is false (English)
     Number_authors_displayed = 5
-    keywords_in_abstract = ['exoplanet', 'rocky planets', 'jupiters', 'protoplanet', 'debris', 'companion', 'exocomet']
+    keywords_exoplanets = [
+        'exoplanet', 'extrasolar', 'rocky planets', 'jupiters', "planetary systems", "sub-neptune", "mini-Neptune",
+        "exo-earth", "super-earths", "exozodiacal", "exoearth", 'protoplanet', 'debris dis', 'companion', 'exocomet',
+        'cheops', "spirou", "habitable planets"
+    ]
 
-    group_publication = list()
-    group_year_publication = list()
-
-    list_authorscsv = pd.read_csv('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_names_exoplanet3.csv', header=1)
+    list_authorscsv = pd.read_csv('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_names_exoplanet4.csv', header=1)
 
     author_list = list()
     for ind in list_authorscsv.index:
@@ -289,45 +652,139 @@ if __name__ == '__main__':
     # indices_here = random.sample(range(0, 175), 20)
     # author_list = [author_list[i] for i in indices_here]
 
-    # author_list = ["Grießmeier, Jean-Mathias", "Fouqué, Pascal","mazoyer, johan"]
-    # author_list = ["Fouqué, Pascal"]
+    # author_list = ["Grießmeier, Jean-Mathias", "Fouqué, Pascal","mazoyer, johan", "lagrange, anne-marie"]
     # author_list = ["mazoyer, johan"]
 
-    for author_name in author_list:
-        print(author_name)
+    dico_keyz = [
+        'title', 'author', 'year', 'volume', 'page', 'pub', 'identifier', 'citation', 'doi', 'abstract', 'grant', 'aff',
+        "bibcode", "property"
+    ]
 
-        list_auth, year_list = create_paper_list(author_name,
-                                                 range_years,
-                                                 Number_authors_displayed=Number_authors_displayed,
-                                                 refereed=True)
+    # all_authors_paper = list()
+    # for author_name in author_list:
+    #     papers = query_papers_with_abstract(author_name, years=range_years, refereed=True, dico_keyz=dico_keyz)
+    #     all_authors_paper.extend(papers)
 
-        group_publication.extend(list_auth)
-        group_year_publication.extend(year_list)
+    # all_authors_paper = remove_doublons_paper_list(all_authors_paper)
 
+    # with open('/Users/jmazoyer/Desktop/papers_exoplanets/paper_list_refered_dictionnary.pkl', 'wb') as f:
+    #     pickle.dump(all_authors_paper, f)
+
+    with open('/Users/jmazoyer/Desktop/papers_exoplanets/paper_list_refered_dictionnary.pkl', 'rb') as f:
+        all_authors_paper = pickle.load(f)
+
+    # all_authors_non_refered_paper = list()
+    # for author_name in author_list:
+    #     papers = query_papers_with_abstract(author_name, years=range_years, refereed=False, dico_keyz=dico_keyz)
+    #     all_authors_non_refered_paper.extend(papers)
+
+    # all_authors_non_refered_paper = remove_doublons_paper_list(all_authors_non_refered_paper)
+
+    # with open('/Users/jmazoyer/Desktop/papers_exoplanets/paper_list_non_refered_dictionnary.pkl', 'wb') as f:
+    #     pickle.dump(all_authors_non_refered_paper, f)
+
+    with open('/Users/jmazoyer/Desktop/papers_exoplanets/paper_list_non_refered_dictionnary.pkl', 'rb') as f:
+        all_authors_non_refered_paper = pickle.load(f)
+
+    # all_authors_conf_paper = list()
+    # for paper in all_authors_non_refered_paper:
+
+    #     if not "ARTICLE" in paper.property:
+    #         continue
+
+    #     if 'SPIE' in paper.bibcode:
+    #         print(paper.author[0], paper.year, paper.pub)
+    #         all_authors_paper.append(paper)
+
+    suppr_manuel_bib = [
+        "2021NatAs...5..345S", "2021A&A...654A..83S", "2023A&A...671A..96M", "2019A&A...623A.117K",
+        "2019A&A...623A.116K", "2020A&A...643A.115B", "2022A&A...667A.111K", "2019A&A...622A.164G",
+        "2022A&A...665A..32D", "2023MNRAS.518.3211S", "2021AJ....161..284M", "2020AJ....160..112P", "2020AJ....160....8E"
+    ]
+
+    triage_papers_kw = list()
+    triage_papers_kw_firstauthors = list()
+
+    for paper in all_authors_paper:
+        # print(paper.citation)
+        # asd
+        if paper.bibcode in suppr_manuel_bib:
+            continue
+
+        kw_bool = False
+        for keyword_in_abstract in keywords_exoplanets:
+            if keyword_in_abstract in paper.title[0].lower():
+                kw_bool = True
+
+        if paper.abstract is not None:
+            for keyword_in_abstract in keywords_exoplanets:
+                if keyword_in_abstract in paper.abstract.lower():
+                    kw_bool = True
+
+        if not kw_bool:
+            continue
+
+        triage_papers_kw.append(paper)
+
+        afil_first_authors = ''
+        for afil in paper.aff[0:Number_authors_displayed]:
+            afil_first_authors += ' ' + afil.lower()
+
+        if 'france' not in afil_first_authors:
+            continue
+
+        # author_bool = False
+        # for researcher_name in author_list:
+        #     if is_name_in_first_authors(researcher_name, paper.author, Number_authors_displayed):
+        #         author_bool = True
+        # if not author_bool:
+        #     continue
+
+        triage_papers_kw_firstauthors.append(paper)
+
+    # ajout manuel papers in ADS
+
+    ## ici, ajouter le bib pour AJOUTER des papiers
+    ajout_manuel_bib = [
+        "2019BAAS...51g.101M", '2020arXiv200305714B', "2022NatAs...6..537B", "2021CeMDA.133...39P", "2021ExA....51..845M"
+    ]
+    for bib in ajout_manuel_bib:
+        papers = list(ads.SearchQuery(bibcode=bib, fl=dico_keyz))
+        triage_papers_kw.extend(papers)
+        triage_papers_kw_firstauthors.extend(papers)
+
+    # ajout manuel papers not in ADS
+    triage_papers_kw_firstauthors = add_manually_publication(triage_papers_kw_firstauthors)
+
+    triage_papers_kw = remove_doublons_paper_list(triage_papers_kw)
+    triage_papers_kw_firstauthors = remove_doublons_paper_list(triage_papers_kw_firstauthors)
+
+    group_publication = list()
+    group_year_publication = list()
+    group_citation_publication = list()
+
+    for paper in triage_papers_kw_firstauthors:
+        group_publication.append(
+            clean_string(create_paper_latex_line_bis(paper, Number_authors_displayed=Number_authors_displayed)))
+        group_year_publication.append(paper.year)
+
+        if paper.citation is not None:
+            group_citation_publication.append(len(paper.citation))
+        else:
+            group_citation_publication.append(0)
+
+    # group_publication_order = [x if numcit > 10 else "" for year, numcit , x in sorted(zip(group_year_publication,group_citation_publication, group_publication))]
+    # group_publication_order = [x for year, numcit , x in sorted(zip(group_year_publication,group_citation_publication, group_publication))]
     group_publication_order = [x for _, x in sorted(zip(group_year_publication, group_publication))]
 
-    group_publication_order_uniq = []
-    for item in group_publication_order:
-        if item not in group_publication_order_uniq:
-            group_publication_order_uniq.append(item)
-
     with open('/Users/jmazoyer/Desktop/papers_exoplanets/Liste_papiers_exoplanet.txt', 'w') as f:
-        for i in group_publication_order_uniq:
+        for i in group_publication_order:
             f.write(i + '\n')
             f.write('\n')
 
-    # for i in group_publication_order_uniq:
-    #     print(i)
-    #     print("")
-    # print(len(group_publication_order_uniq))
-
-    ############################################
-    ## Extract affiliation
-    ###########################################
-    paper_uniq = []
-    for paperi in all_papers:
-        if paperi not in paper_uniq:
-            paper_uniq.append(paperi)
+    # ############################################
+    # ## Extract affiliation
+    # ###########################################
 
     # print(len(all_papers), len(paper_uniq))
     total_apper_with_french_Afil = 0
@@ -344,7 +801,7 @@ if __name__ == '__main__':
 
     year_allpaper = list()
 
-    for toto, paper in enumerate(paper_uniq):
+    for toto, paper in enumerate(triage_papers_kw):
 
         french_afil = list()
         for afil in paper.aff:
@@ -489,7 +946,7 @@ if __name__ == '__main__':
 
             if any(laboname in afil_i for laboname in
                    ["irfu", "laboratoire aim", "aim,", "astrophysique, instrumentation et modelisation"]):
-                french_afil_Acro_this_paper.append("IRFU")
+                french_afil_Acro_this_paper.append("CEA / AIM")
                 not_found_any_afil = False
 
             if any(laboname in afil_i for laboname in ["laboratoire dannecy le vieux de physique theorique", "lapth"]):
@@ -639,21 +1096,21 @@ if __name__ == '__main__':
 
     # first to identify all institution papers
     keys, counts = np.unique(french_afil_Acro_allpaper, return_counts=True)
-    
+
     # print(french_afil_Acro_allpaper)
     big_lab_keys = []
     big_lab_counts = []
 
     #sort by citation to identify biggest lab
-    sorted_keys = [y for _,y in sorted(zip(counts,keys))]
-    sorted_counts = [x for x,_ in sorted(zip(counts,keys))]
+    sorted_keys = [y for _, y in sorted(zip(counts, keys))]
+    sorted_counts = [x for x, _ in sorted(zip(counts, keys))]
 
     if 'Irrelevant' in sorted_keys:
         index_irr = sorted_keys.index('Irrelevant')
         sorted_keys.pop(index_irr)
         sorted_counts.pop(index_irr)
 
-    N_biggest_lab = 12 # we plot only the N bigest labs
+    N_biggest_lab = 12  # we plot only the N bigest labs
 
     if len(sorted_keys) < N_biggest_lab:
         N_biggest_lab = len(sorted_keys)
@@ -661,10 +1118,9 @@ if __name__ == '__main__':
     big_lab_keys = sorted_keys[-N_biggest_lab:]
     big_lab_counts = sorted_counts[-N_biggest_lab:]
 
-
     #sort by citation to alphabetical order
-    sorted_big_keys = [x for x,_ in sorted(zip(big_lab_keys,big_lab_counts))]
-    sorted_big_counts = [y for _,y in sorted(zip(big_lab_keys,big_lab_counts))]
+    sorted_big_keys = [x for x, _ in sorted(zip(big_lab_keys, big_lab_counts))]
+    sorted_big_counts = [y for _, y in sorted(zip(big_lab_keys, big_lab_counts))]
 
     plt.bar(sorted_big_keys, sorted_big_counts)
     plt.ylim(0, 100 * (np.ceil(max(big_lab_counts) * 1.2 / 100)))
@@ -673,7 +1129,8 @@ if __name__ == '__main__':
     plt.title(f"Publications 'exoplanètes' françaises par laboratoire (2019-2023)")
     plt.text(-0.5, max(sorted_big_counts) * 1.18, "Attention, une même publication est ici comptée plusieurs fois si")
     plt.text(-0.5, max(sorted_big_counts) * 1.12, "elle inclue des auteurs dans différents laboratoires français.")
-    plt.text(-0.5, max(sorted_big_counts) * 1.06, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
+    plt.text(-0.5,
+             max(sorted_big_counts) * 1.06, f"Le nombre de publications réel est de {total_apper_with_french_Afil}.")
 
     plt.ylabel('Nombre de publications')
 
@@ -706,10 +1163,10 @@ if __name__ == '__main__':
     f = open('/Users/jmazoyer/Desktop/papers_exoplanets/publi_par_labo.csv', 'w')
 
     # create the csv writer
-    writer = csv.writer(f)
+    # writer = csv.writer(f)
 
     # write a row to the csv file
-    writer.writerow(["labo", "2019", "2020", "2021", "2022", "2023"])
+    # writer.writerow(["labo", "2019", "2020", "2021", "2022", "2023"])
 
     for key in keys:
         if key == "Irrelevant":
@@ -739,13 +1196,14 @@ if __name__ == '__main__':
             counthere2019 = counts2019[np.where(keys2019 == key)][0]
         else:
             counthere2019 = 0
-        writer.writerow([key, counthere2019, counthere2020, counthere2021, counthere2022, counthere2023])
-        
+        # writer.writerow([key, counthere2019, counthere2020, counthere2021, counthere2022, counthere2023])
+
         # line to produce a latex array
-        # print('\hline')        
-        # print(key, ' & ', counthere2019, ' & ', counthere2020, ' & ',counthere2021, ' & ',counthere2022, ' & ',counthere2023, ' \\\\ ')
+        print('\hline')
+        print(key, ' & ', counthere2019, ' & ', counthere2020, ' & ', counthere2021, ' & ', counthere2022, ' & ',
+              counthere2023, ' \\\\ ')
     # close the file
-    f.close()
+    # f.close()
 
     ############################################
     ############################################
