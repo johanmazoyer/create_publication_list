@@ -649,13 +649,11 @@ def create_latex_files(researcher_name,
             outf.write(create_latex_subpart_manually(Name_part=Name_wp_imp, list_ref=add_pub_manually["white_paper"]))
 
         if phd_sec:
-            outf.write(
-                create_latex_subpart(researcher_name,
-                                     Name_part=Name_these,
-                                     years=(2014, 2014),
-                                     reject_kw=None,
-                                     select_kw=['Thesis'],
-                                     bullet='itemize'))
+            if french:
+                Name_wp_imp = 'THESES'
+            else:
+                Name_wp_imp = 'THESIS'
+            outf.write(create_latex_subpart_manually(Name_part=Name_wp_imp, list_ref=add_pub_manually["thesis"]))
 
         outf.write(latex_footer + '\n')
 

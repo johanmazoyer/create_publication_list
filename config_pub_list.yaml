@@ -17,6 +17,8 @@ add_pub_manually:
             - []
 
     white_paper: []
+    
+    thesis: []
 
 # when adding a paper, add a 2 elements list: first one is the position where you want to insert it (year of 'last'),
 # second one is the latex string line
