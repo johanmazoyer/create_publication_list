@@ -5,6 +5,10 @@ import ads
 import yaml
 import unicodedata, string
 
+import warnings
+warnings.simplefilter('ignore', SyntaxWarning)
+
+
 # based and adapted from a code from Michael Mommert:
 # https://mommermi.github.io/software/2019/01/27/generating-latex-publication-lists-from-nasa-ads.html
 
