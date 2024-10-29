@@ -90,6 +90,107 @@ def query_papers(author, refereed=None, years=None, rows=1000):
     return list(papers)
 
 
+
+def create_paper_html_line(paper, researcher_name=None, Number_authors_displayed=3):
+    """From a paper, create a string line in html format.
+
+    Parameters
+    ----------
+    paper: ads publication object
+    researcher_name: string or `None`, name that will be highlighted in latex,
+                    default: `None`
+    Number_authors_displayed: the number of authors displayed in the citation line
+                                    also used to defined what is an "major paper" if
+                                    the authors is in the first Number_authors_displayed authors
+
+    Returns
+    ------------
+    str, latex encoded string for paper
+    """
+    out = ''
+    # put paper title in italic font
+
+    title = paper.title[0]
+    title.replace("★", "*")
+
+    # build author list
+
+    authors = []
+
+    etal = False
+    comma_or_and_between_authors = 'coma'
+
+    if len(paper.author) == 2:
+        comma_or_and_between_authors = 'and'
+
+    for i in range(len(paper.author)):
+        # `name` is the i-th author on this paper
+        author = utf8tolatex(paper.author[i])
+        nom = author.split(',')[0]
+        if len(author.split(',')) > 1:
+            prenoms = author.split(',')[1]
+        else:
+            prenoms = '?'
+        prenoms = prenoms.replace("-", " -")
+        prenoms = prenoms.split(' ')
+        while True:
+            try:
+                prenoms.remove('')
+            except ValueError:
+                break
+
+        for prenomj, prenom in enumerate(prenoms):
+            if prenom[0] == '-':
+                prenoms[prenomj] = prenom[0:2] + '.'
+            elif prenom[0] == '{':
+                end = prenom.find('}')
+                prenoms[prenomj] = prenom[0:end + 1] + '.'
+            else:
+                prenoms[prenomj] = prenom[0] + '.'
+
+        author = nom + ", " + " ".join(prenoms)
+        #print(author)
+
+        if i < 1:
+            authors.append(author)
+
+            #if len(prenoms.split(' ')) > 2:
+            #    print(author.split(' ')[1])
+        else:
+            etal = True
+            break
+
+    # join author list and add 'et al.' if required
+    if etal:
+        authors = ' ; '.join(authors) + ' et al.'
+    else:
+        if comma_or_and_between_authors == 'coma':
+            authors = ' ; '.join(authors)
+        else:
+            authors = ' and '.join(authors)
+
+    year = paper.year
+
+    # create string with journal volume and page number
+    pub = str(paper.pub)
+    if paper.volume is not None:
+        pub += ', ' + str(paper.volume)
+    if paper.page is not None:
+        pub += ', ' + str(paper.page[0])
+
+    doi_link = ''
+    if paper.doi is not None:
+
+        doi_link = ('<a href="https://doi.org/' + paper.doi[0] + '"> <u class="dotted">DOI</u> </a>')
+
+    pdf_link = ('<a href="my_proceedings/NAMEPDF.pdf"> <u class="dotted">PDF</u> </a>')
+
+    # assemble output string as latex bullet list item
+    out = ('<li style="font-size:0.8em">' + authors + ' ('+ year + '), ' + title + ', ' + pub)
+    out += ', ' + doi_link + ', ' + pdf_link + '</li>'
+
+    return out
+
 def create_paper_latex_line(paper, researcher_name=None, Number_authors_displayed=3):
     """From a paper, create a string line in latex format.
 
@@ -570,6 +671,7 @@ def create_latex_files(researcher_name,
         'Bulletin of the American Astronomical Society',
         'Thirty years of Beta Pic',
         'arXiv e-prints',
+        'EAS2024'
     ]
 
     researcher_name_short = researcher_name.split(', ')[0]
