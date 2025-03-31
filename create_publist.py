@@ -669,6 +669,7 @@ def create_latex_files(researcher_name,
         'Thesis',
         'Space Astrophysics Landscape',
         'Bulletin of the American Astronomical Society',
+        'American Astronomical Society Meeting',
         'Thirty years of Beta Pic',
         'arXiv e-prints',
         'EAS2024'
